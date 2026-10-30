@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OMEGA × PHANTOM — Fleet Safety Command</title>
+  <style>
+    :root {
+      --bg: #06080c;
+      --panel: #0c1118;
+      --panel2: #101822;
+      --line: #1b2a38;
+      --line2: #26394b;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f43f5e;
+      --violet: #a78bfa;
+      --pink: #f472b6;
+      --text: #d3e5f0;
+      --dim: #6f8799;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      overflow: hidden
+    }
+
+    button,
+    select,
+    input {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1f3141;
+      border-radius: 4px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: 54px 1fr;
+      height: 100vh
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 16px;
+      background: linear-gradient(180deg, #0d141c, #0a0f15);
+      border-bottom: 1px solid var(--line);
+      position: relative
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: .5
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--cyan);
+      transform: rotate(45deg);
+      position: relative;
+      box-shadow: 0 0 14px rgba(34, 211, 238, .45)
+    }
+
+    .logo::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      background: var(--cyan);
+      opacity: .8
+    }
+
+    .brand h1 {
+      font-size: 15px;
+      letter-spacing: .16em;
+      font-weight: 700
+    }
+
+    .brand h1 span {
+      color: var(--cyan)
+    }
+
+    .brand small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 9.5px;
+      color: var(--dim);
+      letter-spacing: .14em;
+      margin-top: 2px
+    }
+
+    .spacer {
+      flex: 1
+    }
+
+    .chip {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 10px;
+      border: 1px solid var(--line2);
+      border-radius: 3px;
+      background: var(--panel);
+      color: var(--dim);
+      white-space: nowrap
+    }
+
+    .chip b {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    .chip.ok b {
+      color: var(--green)
+    }
+
+    .chip.warn b {
+      color: var(--amber)
+    }
+
+    .chip.bad b {
+      color: var(--red)
+    }
+
+    #btnApprovals {
+      border-color: var(--line2);
+      background: var(--panel);
+      padding: 5px 12px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .06em
+    }
+
+    #btnApprovals.has {
+      border-color: var(--amber);
+      color: var(--amber);
+      animation: pulseB 1.2s infinite
+    }
+
+    @keyframes pulseB {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, .5)
+      }
+
+      50% {
+        box-shadow: 0 0 0 6px rgba(251, 191, 36, 0)
+      }
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 288px minmax(0, 1fr) 392px;
+      min-height: 0
+    }
+
+    aside {
+      background: var(--panel);
+      overflow-y: auto;
+      min-height: 0
+    }
+
+    #left {
+      border-right: 1px solid var(--line)
+    }
+
+    #right {
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column
+    }
+
+    .sec {
+      padding: 14px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .sec h3 {
+      font-size: 10.5px;
+      letter-spacing: .2em;
+      color: var(--dim);
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .sec h3::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--cyan);
+      display: inline-block
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--line2);
+      padding: 8px 10px;
+      border-radius: 3px;
+      text-align: left;
+      margin-bottom: 7px;
+      letter-spacing: .04em;
+      transition: .15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .btn:hover {
+      border-color: var(--cyan);
+      background: #12202c
+    }
+
+    .btn.red {
+      border-color: #5b1f2c;
+      color: #ff8da1
+    }
+
+    .btn.red:hover {
+      border-color: var(--red)
+    }
+
+    .btn.red.on {
+      background: #3a0f1a;
+      border-color: var(--red);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(244, 63, 94, .35) inset
+    }
+
+    .btn.primary {
+      border-color: #115e6d;
+      color: var(--cyan)
+    }
+
+    .btn small {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--dim)
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 7px
+    }
+
+    .row>* {
+      flex: 1
+    }
+
+    .row .btn {
+      margin-bottom: 0
+    }
+
+    select,
+    input[type=text],
+    input[type=number] {
+      background: var(--panel2);
+      border: 1px solid var(--line2);
+      padding: 7px 8px;
+      border-radius: 3px;
+      width: 100%;
+      outline: none
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--cyan)
+    }
+
+    label.chk {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px
+    }
+
+    label.chk input {
+      accent-color: var(--cyan)
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--dim);
+      line-height: 1.5;
+      margin-top: 6px
+    }
+
+    .kbd {
+      font-family: var(--mono);
+      font-size: 10px;
+      border: 1px solid var(--line2);
+      padding: 0 4px;
+      border-radius: 2px;
+      color: var(--text)
+    }
+
+    .amr {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      gap: 2px 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      margin-bottom: 6px;
+      background: var(--panel2);
+      cursor: pointer
+    }
+
+    .amr:hover {
+      border-color: var(--line2)
+    }
+
+    .amr.sel {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(34, 211, 238, .18)
+    }
+
+    .amr .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      grid-row: 1/3
+    }
+
+    .amr b {
+      font-family: var(--mono);
+      font-size: 12px
+    }
+
+    .amr .sub {
+      grid-column: 2/4;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--dim)
+    }
+
+    .st {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 2px;
+      border: 1px solid
+    }
+
+    .st.ok {
+      color: var(--green);
+      border-color: #14513c
+    }
+
+    .st.dw {
+      color: var(--cyan);
+      border-color: #115e6d
+    }
+
+    .st.hd {
+      color: var(--red);
+      border-color: #6b1d2d;
+      background: #2a0d15
+    }
+
+    .st.wn {
+      color: var(--amber);
+      border-color: #6b4e12
+    }
+
+    .center {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) 196px;
+      min-height: 0;
+      min-width: 0
+    }
+
+    #viewport {
+      position: relative;
+      min-height: 0;
+      background: #04060a;
+      overflow: hidden
+    }
+
+    #viewport canvas.gl {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: grab
+    }
+
+    #viewport canvas.gl:active {
+      cursor: grabbing
+    }
+
+    .hud {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 11px;
+      pointer-events: none
+    }
+
+    #hudMode {
+      top: 12px;
+      left: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--line2);
+      background: rgba(8, 12, 18, .8);
+      letter-spacing: .1em;
+      color: var(--dim)
+    }
+
+    #hudMode.red {
+      border-color: var(--red);
+      color: #ff8da1;
+      background: rgba(58, 15, 26, .85);
+      animation: pulseR 1.4s infinite
+    }
+
+    @keyframes pulseR {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, .5)
+      }
+
+      50% {
+        box-shadow: 0 0 0 7px rgba(244, 63, 94, 0)
+      }
+    }
+
+    #hudCam {
+      top: 12px;
+      right: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--line2);
+      background: rgba(8, 12, 18, .8);
+      color: var(--cyan);
+      letter-spacing: .1em
+    }
+
+    #legend {
+      bottom: 12px;
+      left: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--line2);
+      background: rgba(8, 12, 18, .82);
+      line-height: 1.7;
+      color: var(--dim)
+    }
+
+    #legend i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: -1px
+    }
+
+    #toast {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(12, 17, 24, .96);
+      border: 1px solid var(--cyan);
+      padding: 8px 14px;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      opacity: 0;
+      transition: .25s;
+      pointer-events: none;
+      max-width: 70%;
+      text-align: center
+    }
+
+    #toast.show {
+      opacity: 1
+    }
+
+    .audit {
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .audit .bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 10.5px;
+      letter-spacing: .18em;
+      color: var(--dim)
+    }
+
+    .audit .bar .live {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 1.2s infinite
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: .25
+      }
+    }
+
+    .audit .bar button {
+      background: var(--panel2);
+      border: 1px solid var(--line2);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 10px;
+      letter-spacing: .08em
+    }
+
+    #auditList {
+      flex: 1;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 0
+    }
+
+    .ae {
+      display: grid;
+      grid-template-columns: 44px 64px 190px 1fr 150px;
+      gap: 8px;
+      padding: 2px 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      align-items: center
+    }
+
+    .ae:hover {
+      background: #0f1923
+    }
+
+    .ae .i {
+      color: var(--dim)
+    }
+
+    .ae .t {
+      color: var(--dim)
+    }
+
+    .ae .ev {
+      color: var(--cyan);
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ae .d {
+      color: #9fb6c6;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .ae .h {
+      color: var(--green);
+      text-align: right
+    }
+
+    .ae.crit .ev {
+      color: var(--red)
+    }
+
+    .ae.warn .ev {
+      color: var(--amber)
+    }
+
+    .ae.good .ev {
+      color: var(--green)
+    }
+
+    .ae.new {
+      animation: flash 1s
+    }
+
+    @keyframes flash {
+      from {
+        background: #12303a
+      }
+
+      to {
+        background: transparent
+      }
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--line);
+      background: #0a0f15;
+      flex-shrink: 0
+    }
+
+    .tab {
+      flex: 1;
+      padding: 11px 4px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--dim);
+      font-size: 10.5px;
+      letter-spacing: .12em;
+      font-weight: 600
+    }
+
+    .tab:hover {
+      color: var(--text)
+    }
+
+    .tab.on {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+      background: #0c141c
+    }
+
+    .panes {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0
+    }
+
+    .pane {
+      display: none;
+      padding: 14px
+    }
+
+    .pane.on {
+      display: block
+    }
+
+    .card {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 12px;
+      margin-bottom: 12px
+    }
+
+    .card h4 {
+      font-size: 10.5px;
+      letter-spacing: .16em;
+      color: var(--dim);
+      margin-bottom: 10px;
+      font-weight: 600
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 5px 10px;
+      font-family: var(--mono);
+      font-size: 11.5px
+    }
+
+    .kv span:nth-child(odd) {
+      color: var(--dim)
+    }
+
+    .kv span:nth-child(even) {
+      text-align: right
+    }
+
+    .big {
+      font-family: var(--mono);
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: .02em
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 11px
+    }
+
+    th {
+      font-weight: 600;
+      text-align: left;
+      color: var(--dim);
+      font-size: 10px;
+      letter-spacing: .1em;
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--line2)
+    }
+
+    td {
+      padding: 5px 6px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    td.r,
+    th.r {
+      text-align: right
+    }
+
+    .good {
+      color: var(--green)
+    }
+
+    .warnc {
+      color: var(--amber)
+    }
+
+    .bad {
+      color: var(--red)
+    }
+
+    .gauge {
+      height: 8px;
+      background: #0a1017;
+      border: 1px solid var(--line2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 8px 0
+    }
+
+    .gauge>div {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+      background-size: 300px 100%;
+      transition: width .3s
+    }
+
+    canvas.cv {
+      width: 100%;
+      height: 130px;
+      display: block;
+      background: #0a1017;
+      border: 1px solid var(--line);
+      border-radius: 2px
+    }
+
+    .ebar {
+      display: grid;
+      grid-template-columns: 44px 1fr 62px;
+      gap: 8px;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      margin: 5px 0
+    }
+
+    .ebar .tr {
+      height: 7px;
+      background: #0a1017;
+      border: 1px solid var(--line)
+    }
+
+    .ebar .tr>div {
+      height: 100%;
+      transition: width .3s
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--cyan)
+    }
+
+    .prog {
+      height: 6px;
+      background: #0a1017;
+      border: 1px solid var(--line2);
+      margin: 8px 0
+    }
+
+    .prog>div {
+      height: 100%;
+      width: 0;
+      background: var(--cyan);
+      transition: width .1s
+    }
+
+    .mono {
+      font-family: var(--mono)
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 2px;
+      border: 1px solid;
+      letter-spacing: .08em
+    }
+
+    .badge.ok {
+      color: var(--green);
+      border-color: #14513c
+    }
+
+    .badge.warn {
+      color: var(--amber);
+      border-color: #6b4e12
+    }
+
+    .badge.bad {
+      color: var(--red);
+      border-color: #6b1d2d
+    }
+
+    /* modal */
+    #modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 4, 8, .72);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50
+    }
+
+    #modal.open {
+      display: flex
+    }
+
+    .mcard {
+      width: min(540px, 92vw);
+      background: var(--panel);
+      border: 1px solid var(--amber);
+      box-shadow: 0 0 40px rgba(251, 191, 36, .18);
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .mcard.hz {
+      border-color: var(--red);
+      box-shadow: 0 0 40px rgba(244, 63, 94, .22)
+    }
+
+    .mhead {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .mhead h2 {
+      font-size: 14px;
+      letter-spacing: .08em;
+      flex: 1
+    }
+
+    .mbody {
+      padding: 16px 18px
+    }
+
+    .mbody p {
+      color: #9fb6c6;
+      line-height: 1.55;
+      margin-bottom: 12px
+    }
+
+    .mgrid {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 6px 10px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: 3px
+    }
+
+    .mgrid span:nth-child(odd) {
+      color: var(--dim)
+    }
+
+    .mfoot {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      background: #0a0f15
+    }
+
+    .mfoot button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 3px;
+      border: 1px solid;
+      font-weight: 700;
+      letter-spacing: .1em;
+      font-size: 12px
+    }
+
+    #mApprove {
+      background: #0e3a2b;
+      border-color: var(--green);
+      color: var(--green)
+    }
+
+    #mApprove:hover {
+      background: #14513c
+    }
+
+    #mReject {
+      background: #3a0f1a;
+      border-color: var(--red);
+      color: var(--red)
+    }
+
+    #mReject:hover {
+      background: #5b1625
+    }
+
+    #mCancel {
+      background: var(--panel2);
+      border-color: var(--line2);
+      color: var(--dim)
+    }
+
+    #mCancel:hover {
+      color: var(--text);
+      border-color: var(--text)
+    }
+
+    .mmeta {
+      padding: 8px 18px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--dim);
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between
+    }
+
+    /* copilot */
+    #cpToggle {
+      position: fixed;
+      right: 412px;
+      bottom: 214px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0e7490, #22d3ee);
+      border: none;
+      color: #04121a;
+      font-weight: 800;
+      font-size: 12px;
+      z-index: 30;
+      box-shadow: 0 0 24px rgba(34, 211, 238, .45)
+    }
+
+    #cpPanel {
+      position: fixed;
+      right: 412px;
+      bottom: 274px;
+      width: 340px;
+      height: 420px;
+      max-height: 60vh;
+      background: var(--panel);
+      border: 1px solid var(--cyan);
+      border-radius: 4px;
+      display: none;
+      flex-direction: column;
+      z-index: 30;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .6)
+    }
+
+    #cpPanel.open {
+      display: flex
+    }
+
+    .cph {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 11px;
+      letter-spacing: .12em
+    }
+
+    .cph b {
+      flex: 1;
+      color: var(--cyan)
+    }
+
+    .cph select {
+      width: 110px;
+      padding: 4px
+    }
+
+    #cpLog {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .msg {
+      padding: 7px 10px;
+      border-radius: 3px;
+      max-width: 88%;
+      line-height: 1.45;
+      font-size: 12px
+    }
+
+    .msg.bot {
+      background: var(--panel2);
+      border: 1px solid var(--line2);
+      align-self: flex-start
+    }
+
+    .msg.me {
+      background: #0e3a46;
+      border: 1px solid #115e6d;
+      align-self: flex-end
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 10px 8px
+    }
+
+    .chips button {
+      background: var(--panel2);
+      border: 1px solid var(--line2);
+      border-radius: 10px;
+      padding: 3px 9px;
+      font-size: 10.5px;
+      color: var(--dim)
+    }
+
+    .chips button:hover {
+      color: var(--cyan);
+      border-color: var(--cyan)
+    }
+
+    .cpi {
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      border-top: 1px solid var(--line)
+    }
+
+    .cpi button {
+      background: var(--cyan);
+      color: #04121a;
+      border: none;
+      border-radius: 3px;
+      padding: 0 12px;
+      font-weight: 700
+    }
+
+    @media (max-width:1100px) {
+
+      html,
+      body {
+        overflow: auto
+      }
+
+      .app {
+        height: auto
+      }
+
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      #viewport {
+        height: 62vh
+      }
+
+      .center {
+        grid-template-rows: 62vh 220px
+      }
+
+      #cpToggle,
+      #cpPanel {
+        right: 14px
+      }
+
+      #cpToggle {
+        bottom: 14px
+      }
+
+      #cpPanel {
+        bottom: 74px
+      }
+
+      .ae {
+        grid-template-columns: 40px 60px 150px 1fr
+      }
+
+      .ae .h {
+        display: none
+      }
+
+      header .chip.hide-sm {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>OMEGA <span>×</span> PHANTOM</h1><small>FLEET SAFETY COMMAND · DIGITAL TWIN</small>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="chip hide-sm">SIM <b id="simTime">00:00</b></div>
+      <div class="chip" id="riskChip">RISK <b id="riskVal">LOW</b></div>
+      <div class="chip ok hide-sm" id="chainChip">CHAIN <b id="chainVal">VERIFIED</b></div>
+      <button id="btnApprovals">APPROVALS <span id="approvalCount">0</span></button>
+      <div class="chip hide-sm"><b id="clock">--:--:--</b></div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT -->
+      <aside id="left">
+        <div class="sec">
+          <h3>MISSION CONTROL</h3>
+          <button class="btn red" id="btnRed"><span>RED TEAM MODE</span><small id="redState">OFF</small></button>
+          <div class="row" style="margin-bottom:7px"><button class="btn red" id="btnInject"
+              style="margin:0"><span>Inject</span></button><button class="btn" id="btnClear"
+              style="margin:0"><span>Clear</span></button></div>
+          <button class="btn primary" id="btnOptimize"><span>Optimize fleet routes</span><small>needs
+              approval</small></button>
+          <label class="chk"><input type="checkbox" id="chkSafety" checked> Safety stack (TTC braking + reroute)</label>
+          <label class="chk"><input type="checkbox" id="chkRings" checked> Collision danger zones</label>
+          <label class="chk"><input type="checkbox" id="chkRoutes" checked> Route lines &amp; reroutes</label>
+          <label class="chk"><input type="checkbox" id="chkGhost"> Digital-twin reality ghosts</label>
+          <div style="margin-top:8px">
+            <div class="hint" style="margin:0 0 4px">Simulation speed</div>
+            <select id="selSpeed">
+              <option value="1">1× realtime</option>
+              <option value="2">2×</option>
+              <option value="4">4×</option>
+              <option value="8">8×</option>
+            </select>
+          </div>
+          <div class="hint">Red Team: arm it, then click an aisle in the 3D view to drop a hazard. Every hazard opens a
+            human approval request.</div>
+        </div>
+        <div class="sec">
+          <h3>CAMERA</h3>
+          <div class="row"><select id="selFollow">
+              <option value="">Free camera</option>
+              <option value="0">Follow AMR-1</option>
+              <option value="1">Follow AMR-2</option>
+              <option value="2">Follow AMR-3</option>
+              <option value="3">Follow AMR-4</option>
+              <option value="4">Follow AMR-5</option>
+            </select></div>
+          <div class="row"><button class="btn" id="btnFollow"><span>Follow</span></button><button class="btn"
+              id="btnReset"><span>Reset View</span></button></div>
+          <div class="hint">Drag = orbit · right-drag/Shift = pan · wheel = zoom · click an AMR to follow. Keys <span
+              class="kbd">1</span>–<span class="kbd">5</span> follow, <span class="kbd">0</span> reset, <span
+              class="kbd">R</span> red team.</div>
+        </div>
+        <div class="sec">
+          <h3>AMR ROSTER</h3>
+          <div id="roster"></div>
+        </div>
+      </aside>
+
+      <!-- CENTER -->
+      <section class="center">
+        <div id="viewport">
+          <div class="hud" id="hudMode">NOMINAL OPERATIONS</div>
+          <div class="hud" id="hudCam">FREE CAM</div>
+          <div class="hud" id="legend">
+            <div><i style="background:#34d399"></i>TTC &gt; 4 s</div>
+            <div><i style="background:#fbbf24"></i>TTC 2–4 s</div>
+            <div><i style="background:#f43f5e"></i>TTC &lt; 2 s</div>
+            <div style="color:#8ea6b8">ring = v²/2a + v·t<sub>react</sub> + v·horizon</div>
+          </div>
+          <div id="toast"></div>
+        </div>
+        <div class="audit">
+          <div class="bar"><span class="live"></span><span>SHA-256 AUDIT TRAIL</span><span id="auditCount"
+              class="mono">0 blocks</span><span class="spacer"></span><span id="auditState" class="mono"
+              style="color:var(--green);letter-spacing:.08em">CHAIN VERIFIED</span><button
+              id="btnVerify">VERIFY</button></div>
+          <div id="auditList"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside id="right">
+        <div class="tabs">
+          <button class="tab on" data-tab="safety">SAFETY</button>
+          <button class="tab" data-tab="fleet">ROUTE·ENERGY</button>
+          <button class="tab" data-tab="twin">TWIN GAP</button>
+          <button class="tab" data-tab="lab">SCENARIO LAB</button>
+        </div>
+        <div class="panes">
+          <!-- SAFETY -->
+          <div class="pane on" id="pane-safety">
+            <div class="card">
+              <h4>FLEET COLLISION RISK</h4>
+              <div class="big" id="riskText">LOW</div>
+              <div class="gauge">
+                <div id="riskBar"></div>
+              </div>
+              <div class="kv"><span>Min time-to-collision</span><span id="minTtc">—</span><span>Robots in safety
+                  hold</span><span id="holdCount">0</span><span>Active hazards</span><span
+                  id="hazCount">0</span><span>Near-misses / collisions</span><span id="nmCount">0 / 0</span></div>
+            </div>
+            <div class="card">
+              <h4>DYNAMIC DANGER ZONES</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>AMR</th>
+                    <th class="r">v m/s</th>
+                    <th class="r">stop m</th>
+                    <th class="r">ring m</th>
+                    <th class="r">TTC</th>
+                    <th>state</th>
+                  </tr>
+                </thead>
+                <tbody id="ttcTable"></tbody>
+              </table>
+              <div style="margin-top:12px">
+                <div class="hint" style="margin:0 0 4px">TTC look-ahead horizon: <b id="horizonVal" class="mono">2.0
+                    s</b></div><input type="range" id="rngHorizon" min="1" max="5" step="0.5" value="2">
+              </div>
+              <div class="hint">Stopping distance = v²/(2·a<sub>brake</sub>) + v·t<sub>react</sub> with
+                a<sub>brake</sub>=3.0 m/s² and t<sub>react</sub>=0.3 s. Inner ring = stopping distance; outer ring adds
+                the look-ahead v·horizon. Ring colour follows each AMR's lowest TTC (robot-to-robot and
+                robot-to-hazard).</div>
+            </div>
+          </div>
+
+          <!-- FLEET & ENERGY -->
+          <div class="pane" id="pane-fleet">
+            <div class="card">
+              <h4>FLEET ROUTE OPTIMIZATION</h4>
+              <div class="kv" id="routeStats"></div>
+              <div class="hint">Solid lines = active routes. Dashed red = superseded route (fades after 12 s). Routes
+                are planned with A* + congestion cost; changes need operator approval.</div>
+              <button class="btn primary" id="btnOptimize2" style="margin-top:10px"><span>Request
+                  optimization</span><small>human approval</small></button>
+            </div>
+            <div class="card">
+              <h4>ENERGY INTELLIGENCE</h4>
+              <div class="kv" id="energyStats"></div>
+              <canvas class="cv" id="cvPower" style="margin-top:10px"></canvas>
+              <div class="hint" style="margin:4px 0 8px">Fleet power draw (kW), last 2 minutes</div>
+              <div id="energyBars"></div>
+            </div>
+          </div>
+
+          <!-- TWIN -->
+          <div class="pane" id="pane-twin">
+            <div class="card">
+              <h4>DIGITAL TWIN VS REALITY GAP</h4>
+              <div style="display:flex;align-items:baseline;gap:10px">
+                <div class="big" id="twinIdx">0</div><span class="mono" style="color:var(--dim)">/ 100</span><span
+                  class="spacer"></span><span class="badge ok" id="twinBadge">SYNCED</span>
+              </div>
+              <div class="gauge">
+                <div id="twinBar"></div>
+              </div>
+              <canvas class="cv" id="cvTwin"></canvas>
+              <div class="hint" style="margin:4px 0 10px">Gap index history, last 2 minutes</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>AMR</th>
+                    <th class="r">pos err m</th>
+                    <th class="r">ETA err s</th>
+                    <th class="r">energy err %</th>
+                  </tr>
+                </thead>
+                <tbody id="twinTable"></tbody>
+              </table>
+              <button class="btn" id="btnRecal" style="margin-top:12px"><span>Recalibrate twin</span><small>logs to
+                  audit</small></button>
+              <div class="hint">Twin = simulated state; reality = twin + sensor noise, wheel slip drift and energy bias
+                that grow under hazards. Enable "reality ghosts" to see them in 3D.</div>
+            </div>
+          </div>
+
+          <!-- LAB -->
+          <div class="pane" id="pane-lab">
+            <div class="card">
+              <h4>SCENARIO LAB — 100-RUN BENCHMARK</h4>
+              <div class="row">
+                <div>
+                  <div class="hint" style="margin:0 0 4px">Base seed</div><input type="number" id="inpSeed"
+                    value="2026">
+                </div>
+                <div style="display:flex;align-items:flex-end"><button class="btn primary" id="btnRunLab"
+                    style="margin:0;justify-content:center"><span>RUN 100</span></button></div>
+              </div>
+              <div class="prog">
+                <div id="labBar"></div>
+              </div>
+              <div class="mono" id="labProg" style="font-size:11px;color:var(--dim)">Idle. Each run: 5 AMRs, 120 s of
+                sim time, 1–2 seeded hazards. Baseline = static routes, no TTC braking. Improved = TTC braking + hazard
+                reroute + congestion-aware A*.</div>
+            </div>
+            <div class="card" id="labResults" style="display:none">
+              <h4>BASELINE VS IMPROVED (MEAN OF 100)</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>metric</th>
+                    <th class="r">baseline</th>
+                    <th class="r">improved</th>
+                    <th class="r">Δ</th>
+                  </tr>
+                </thead>
+                <tbody id="labTable"></tbody>
+              </table>
+              <canvas class="cv" id="cvLabBars" style="height:170px;margin-top:12px"></canvas>
+              <div class="hint" style="margin:4px 0 10px">Grouped bars: baseline (red) vs improved (cyan), each metric
+                scaled to its own max.</div>
+              <canvas class="cv" id="cvLabLine"></canvas>
+              <div class="hint" style="margin:4px 0 10px">Near-misses per run (run 1 → 100)</div>
+              <div class="mono" id="labDigest" style="font-size:10.5px;word-break:break-all;color:var(--dim)"></div>
+              <button class="btn" id="btnVerifyLab" style="margin-top:10px"><span>Re-run to verify
+                  repeatability</span></button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Approval modal -->
+  <div id="modal">
+    <div class="mcard" id="mCard">
+      <div class="mhead">
+        <h2 id="mTitle">Approval required</h2><span class="badge warn" id="mBadge">PENDING</span>
+      </div>
+      <div class="mbody">
+        <p id="mDesc"></p>
+        <div class="mgrid" id="mGrid"></div>
+      </div>
+      <div class="mfoot"><button id="mApprove">APPROVE</button><button id="mReject">REJECT</button><button
+          id="mCancel">CANCEL</button></div>
+      <div class="mmeta"><span id="mQueue">1 of 1</span><span>Operator OP-7 · decision is SHA-256 chained</span></div>
+    </div>
+  </div>
+
+  <!-- Copilot -->
+  <button id="cpToggle" title="AI Copilot">AI</button>
+  <div id="cpPanel">
+    <div class="cph"><b>OMEGA COPILOT</b><select id="cpLang"></select></div>
+    <div id="cpLog"></div>
+    <div class="chips" id="cpChips"></div>
+    <div class="cpi"><input type="text" id="cpInput" placeholder="Ask or command…" autocomplete="off"><button
+        id="cpSend">SEND</button></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      /* ================= utilities ================= */
+      const $ = s => document.querySelector(s);
+      const $$ = s => Array.from(document.querySelectorAll(s));
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const pad2 = n => String(n).padStart(2, '0');
+      const hex = c => '#' + c.toString(16).padStart(6, '0');
+      function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+      function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+      function lerpAngle(a, b, k) { const d = ((b - a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a + d * k; }
+      const fmtT = t => isFinite(t) ? t.toFixed(1) + ' s' : '—';
+
+      /* ---- SHA-256 (synchronous, UTF-8) ---- */
+      const K256 = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+      function sha256(msg) {
+        const bytes = new TextEncoder().encode(msg), l = bytes.length, nb = ((l + 9 + 63) >> 6) << 6;
+        const buf = new Uint8Array(nb); buf.set(bytes); buf[l] = 0x80;
+        const dv = new DataView(buf.buffer); dv.setUint32(nb - 4, (l * 8) >>> 0); dv.setUint32(nb - 8, Math.floor(l * 8 / 4294967296));
+        const H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19], w = new Uint32Array(64);
+        for (let i = 0; i < nb; i += 64) {
+          for (let t = 0; t < 16; t++)w[t] = dv.getUint32(i + t * 4);
+          for (let t = 16; t < 64; t++) { const a = w[t - 15], b = w[t - 2]; const s0 = (a >>> 7 | a << 25) ^ (a >>> 18 | a << 14) ^ (a >>> 3); const s1 = (b >>> 17 | b << 15) ^ (b >>> 19 | b << 13) ^ (b >>> 10); w[t] = (w[t - 16] + s0 + w[t - 7] + s1) >>> 0; }
+          let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+          for (let t = 0; t < 64; t++) {
+            const S1 = (e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7), ch = (e & f) ^ (~e & g), t1 = (h + S1 + ch + K256[t] + w[t]) >>> 0;
+            const S0 = (a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10), mj = (a & b) ^ (a & c) ^ (b & c), t2 = (S0 + mj) >>> 0;
+            h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+          }
+          H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0; H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0; H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0; H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+        }
+        return H.map(x => x.toString(16).padStart(8, '0')).join('');
+      }
+
+      /* ================= warehouse grid + planner ================= */
+      const GW = 40, GD = 28, N = GW * GD, VMAX = 2.0, A_ACC = 1.6, A_BRAKE = 3.0, T_REACT = 0.3, BODY = 0.5;
+      const cx2x = ix => ix - GW / 2 + 0.5, cz2z = iz => iz - GD / 2 + 0.5;
+      const x2cx = x => clamp(Math.floor(x + GW / 2), 0, GW - 1), z2cz = z => clamp(Math.floor(z + GD / 2), 0, GD - 1);
+      const SHELF_X = [-12, -4, 4, 12], SHELF_Z = [-9, -3, 3, 9];
+      const blocked = new Uint8Array(N);
+      for (let iz = 0; iz < GD; iz++)for (let ix = 0; ix < GW; ix++) { const x = cx2x(ix), z = cz2z(iz); for (const sx of SHELF_X) for (const sz of SHELF_Z) if (Math.abs(x - sx) < 3 && Math.abs(z - sz) < 1) blocked[iz * GW + ix] = 1; }
+      const pickCells = [];
+      for (let iz = 0; iz < GD; iz++)for (let ix = 0; ix < GW; ix++) {
+        const i = iz * GW + ix; if (blocked[i]) continue;
+        if ((ix > 0 && blocked[i - 1]) || (ix < GW - 1 && blocked[i + 1]) || (iz > 0 && blocked[i - GW]) || (iz < GD - 1 && blocked[i + GW])) pickCells.push(i);
+      }
+
+      class Heap {
+        constructor() { this.k = []; this.v = []; }
+        get size() { return this.k.length; }
+        push(v, k) { const K = this.k, V = this.v; let i = K.length; K.push(k); V.push(v); while (i > 0) { const p = (i - 1) >> 1; if (K[p] <= K[i]) break;[K[p], K[i]] = [K[i], K[p]];[V[p], V[i]] = [V[i], V[p]]; i = p; } }
+        pop() { const K = this.k, V = this.v, top = V[0], lk = K.pop(), lv = V.pop(); if (K.length) { K[0] = lk; V[0] = lv; let i = 0; for (; ;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < K.length && K[l] < K[m]) m = l; if (r < K.length && K[r] < K[m]) m = r; if (m === i) break;[K[m], K[i]] = [K[i], K[m]];[V[m], V[i]] = [V[i], V[m]]; i = m; } } return top; }
+      }
+      const DX = [1, -1, 0, 0], DZ = [0, 0, 1, -1];
+      function astar(sx, sz, gx, gz, extra, cost) {
+        const s = sz * GW + sx, t = gz * GW + gx;
+        if (blocked[t] || (extra && extra[t])) return null;
+        if (s === t) return [[sx, sz]];
+        const g = new Float32Array(N).fill(1e9), par = new Int32Array(N).fill(-1), dir = new Int8Array(N).fill(-1), closed = new Uint8Array(N), heap = new Heap();
+        g[s] = 0; heap.push(s, Math.abs(sx - gx) + Math.abs(sz - gz));
+        while (heap.size) {
+          const cur = heap.pop(); if (closed[cur]) continue; closed[cur] = 1; if (cur === t) break;
+          const cx = cur % GW, cz = (cur / GW) | 0;
+          for (let d = 0; d < 4; d++) {
+            const nx = cx + DX[d], nz = cz + DZ[d]; if (nx < 0 || nz < 0 || nx >= GW || nz >= GD) continue;
+            const ni = nz * GW + nx; if (blocked[ni] || (extra && extra[ni]) || closed[ni]) continue;
+            const ng = g[cur] + 1 + (cost ? cost[ni] : 0) + (dir[cur] >= 0 && dir[cur] !== d ? 0.35 : 0);
+            if (ng < g[ni]) { g[ni] = ng; par[ni] = cur; dir[ni] = d; heap.push(ni, ng + Math.abs(nx - gx) + Math.abs(nz - gz)); }
+          }
+        }
+        if (par[t] < 0) return null;
+        const out = []; let c = t; while (c !== -1) { out.push([c % GW, (c / GW) | 0]); c = par[c]; }
+        return out.reverse();
+      }
+      function simplify(cells) {
+        const pts = []; const P = c => ({ x: cx2x(c[0]), z: cz2z(c[1]) });
+        if (!cells.length) return pts; pts.push(P(cells[0]));
+        for (let i = 1; i < cells.length - 1; i++) {
+          const a = cells[i - 1], b = cells[i], c = cells[i + 1];
+          if ((b[0] - a[0]) !== (c[0] - b[0]) || (b[1] - a[1]) !== (c[1] - b[1])) pts.push(P(b));
+        }
+        if (cells.length > 1) pts.push(P(cells[cells.length - 1]));
+        return pts;
+      }
+      function overlapCount(arrs) { const m = new Map(); arrs.forEach((a, i) => { for (const c of new Set(a)) m.set(c, (m.get(c) || 0) + 1); }); let n = 0; m.forEach(v => { if (v >= 2) n++; }); return n; }
+
+      /* ================= fleet simulation (shared by live view + Scenario Lab) ================= */
+      const AMR_COLORS = [0x22d3ee, 0x34d399, 0xfbbf24, 0xa78bfa, 0xf472b6];
+      const HAZ_TYPES = [{ k: 'SPILL', r: 1.6 }, { k: 'DEBRIS', r: 1.3 }, { k: 'HUMAN ENTRY', r: 2.2 }, { k: 'BLOCKED AISLE', r: 1.8 }];
+      class FleetSim {
+        constructor(o) {
+          this.improved = o.improved; this.autoApprove = !!o.autoApprove; this.emit = o.onEvent || null;
+          this.t = 0; this.hazards = []; this.hazSeq = 0;
+          this.m = { nm: 0, col: 0, hv: 0, picks: 0, wh: 0, hold: 0 };
+          this.pairState = {}; this.hvState = {};
+          this.ttcM = Array.from({ length: 5 }, () => new Array(5).fill(Infinity));
+          this.dM = Array.from({ length: 5 }, () => new Array(5).fill(99));
+          const starts = [[1, 1], [1, 26], [38, 1], [38, 26], [20, 14]];
+          this.robots = starts.map((s, i) => ({ id: i, color: AMR_COLORS[i], x: cx2x(s[0]), z: cz2z(s[1]), v: 0, dx: 1, dz: 0, path: [], pathCells: [], prevPath: [], prevT: -99, goal: null, dwell: 0.3 * i, hold: null, stuck: 0, retry: 0, minTTC: Infinity, stopDist: 0, energyWh: 0, kw: 0, picks: 0, dist: 0, rng: mulberry32(o.seed * 131 + i * 977 + 7), lastHoldEmit: -99, holdPrev: null }));
+          this.schedule = [];
+          if (o.schedule) {
+            const rs = mulberry32(o.seed * 7919 + 13); const n = 1 + Math.floor(rs() * 2);
+            for (let k = 0; k < n; k++) { let c; do { c = Math.floor(rs() * N); } while (blocked[c]); this.schedule.push({ t: 15 + rs() * 35, x: cx2x(c % GW), z: cz2z((c / GW) | 0), r: 1.5 }); }
+            this.schedule.sort((a, b) => a.t - b.t);
+          }
+        }
+        stamp(m, h) { const R = h.r + 0.9; for (let iz = 0; iz < GD; iz++)for (let ix = 0; ix < GW; ix++)if (Math.hypot(cx2x(ix) - h.x, cz2z(iz) - h.z) < R) m[iz * GW + ix] = 1; }
+        hazardMask() { const m = new Uint8Array(N); for (const h of this.hazards) if (h.state === 'MITIGATED') this.stamp(m, h); return m; }
+        congestion(exceptId) { const c = new Float32Array(N); for (const r of this.robots) { if (r.id === exceptId) continue; for (const ci of r.pathCells) c[ci] += 1.2; } return c; }
+        remLen(r) { let L = 0, px = r.x, pz = r.z; for (const w of r.path) { L += Math.hypot(w.x - px, w.z - pz); px = w.x; pz = w.z; } return L; }
+        plan(r, gx, gz, temp, cong) {
+          const sx = x2cx(r.x), sz = z2cz(r.z); let extra = null, cost = null;
+          if (this.improved) {
+            extra = this.hazardMask();
+            if (extra[sz * GW + sx]) { for (let iz = 0; iz < GD; iz++)for (let ix = 0; ix < GW; ix++)if (Math.hypot(cx2x(ix) - r.x, cz2z(iz) - r.z) < 2.5) extra[iz * GW + ix] = 0; }
+            if (temp) { for (const o of this.robots) { if (o === r) continue; for (let iz = 0; iz < GD; iz++)for (let ix = 0; ix < GW; ix++)if (Math.hypot(cx2x(ix) - o.x, cz2z(iz) - o.z) < 1.6) extra[iz * GW + ix] = 1; } extra[sz * GW + sx] = 0; }
+            cost = cong || this.congestion(r.id);
+          }
+          return astar(sx, sz, gx, gz, extra, cost);
+        }
+        snap(r) { return r.path.length ? [{ x: r.x, z: r.z }, ...r.path.map(p => ({ x: p.x, z: p.z }))] : []; }
+        setPath(r, cells, keepPrev) {
+          if (keepPrev) { const s = this.snap(r); if (s.length) { r.prevPath = s; r.prevT = this.t; } }
+          r.pathCells = cells.map(c => c[1] * GW + c[0]); r.path = simplify(cells);
+          if (r.path.length > 1) { const a = r.path[0], b = r.path[1]; if ((r.x - a.x) * (b.x - a.x) + (r.z - a.z) * (b.z - a.z) > 0) r.path.shift(); }
+        }
+        newGoal(r, keepPrev) {
+          for (let k = 0; k < 6; k++) {
+            const c = pickCells[Math.floor(r.rng() * pickCells.length)], gx = c % GW, gz = (c / GW) | 0;
+            if (gx === x2cx(r.x) && gz === z2cz(r.z)) continue;
+            const cells = this.plan(r, gx, gz); if (cells) { r.goal = c; this.setPath(r, cells, keepPrev); return true; }
+          }
+          r.goal = null; r.retry = 1; return false;
+        }
+        addHazard(x, z, rad, kind) {
+          const h = { id: ++this.hazSeq, x, z, r: rad, kind, state: this.autoApprove ? 'MITIGATED' : 'PENDING', t: this.t };
+          this.hazards.push(h);
+          if (this.autoApprove && this.improved) this.mitigate(h, true);
+          return h;
+        }
+        previewHazard(h) {
+          const saved = h.state; h.state = 'MITIGATED'; const mask = new Uint8Array(N); this.stamp(mask, h); const res = [];
+          for (const r of this.robots) {
+            const hit = r.pathCells.some(ci => mask[ci]) || (r.goal !== null && mask[r.goal]);
+            if (!hit) continue;
+            const old = this.remLen(r); let nw = null;
+            if (r.goal !== null && !mask[r.goal]) { const cells = this.plan(r, r.goal % GW, (r.goal / GW) | 0); if (cells) nw = cells.length - 1; }
+            res.push({ id: r.id, old, nw });
+          }
+          h.state = saved; return res;
+        }
+        mitigate(h, silent) {
+          h.state = 'MITIGATED'; const info = { rerouted: 0, extra: 0 }; if (!this.improved) return info;
+          const mask = new Uint8Array(N); this.stamp(mask, h);
+          for (const r of this.robots) {
+            const hit = r.pathCells.some(ci => mask[ci]) || (r.goal !== null && mask[r.goal]);
+            const inside = Math.hypot(r.x - h.x, r.z - h.z) < h.r + 0.9;
+            if (!hit && !inside) continue;
+            const old = this.remLen(r); let ok = false;
+            if (r.goal !== null && !mask[r.goal]) { const cells = this.plan(r, r.goal % GW, (r.goal / GW) | 0); if (cells) { this.setPath(r, cells, true); ok = true; } }
+            if (!ok) { const prev = this.snap(r); r.path = []; r.pathCells = []; r.goal = null; if (this.newGoal(r, false) && prev.length) { r.prevPath = prev; r.prevT = this.t; } }
+            info.rerouted++; info.extra += this.remLen(r) - old;
+          }
+          return info;
+        }
+        computeOptimization() {
+          const R = this.robots; const cur = R.map(r => r.pathCells.slice());
+          const before = { len: R.reduce((s, r) => s + this.remLen(r), 0), ov: overlapCount(cur) };
+          const next = cur.map(a => a.slice()); const lens = R.map(r => this.remLen(r)); const changes = [];
+          const order = R.filter(r => r.goal !== null && r.path.length).sort((a, b) => this.remLen(b) - this.remLen(a));
+          const score = (arr, id) => { let s = arr.length; for (const ci of arr) { let o = 0; for (let i = 0; i < R.length; i++)if (i !== id && next[i].includes(ci)) o++; s += o * 1.2; } return s; };
+          for (const r of order) {
+            const cong = new Float32Array(N); for (let i = 0; i < R.length; i++) { if (i === r.id) continue; for (const ci of next[i]) cong[ci] += 1.2; }
+            const cells = this.plan(r, r.goal % GW, (r.goal / GW) | 0, false, cong); if (!cells) continue;
+            const ncells = cells.map(c => c[1] * GW + c[0]);
+            if (score(ncells, r.id) < score(next[r.id], r.id) - 0.5) { next[r.id] = ncells; lens[r.id] = cells.length - 1; changes.push({ r, cells }); }
+          }
+          return { changes, before, after: { len: lens.reduce((a, b) => a + b, 0), ov: overlapCount(next) } };
+        }
+        applyOptimization(ch) { for (const c of ch) this.setPath(c.r, c.cells, true); return ch.length; }
+        step(dt) {
+          this.t += dt;
+          while (this.schedule.length && this.schedule[0].t <= this.t) { const s = this.schedule.shift(); this.addHazard(s.x, s.z, s.r, 'SIM'); }
+          const R = this.robots, n = R.length;
+          for (const r of R) { r.stopDist = r.v * r.v / (2 * A_BRAKE) + r.v * T_REACT; r.minTTC = Infinity; }
+          for (let i = 0; i < n; i++)for (let j = i + 1; j < n; j++) {
+            const a = R[i], b = R[j], rx = b.x - a.x, rz = b.z - a.z, d = Math.hypot(rx, rz) || 1e-6;
+            const cl = ((a.dx * a.v - b.dx * b.v) * rx + (a.dz * a.v - b.dz * b.v) * rz) / d;
+            const ttc = cl > 0.05 ? Math.max(0, d - 2 * BODY) / cl : Infinity;
+            this.ttcM[i][j] = this.ttcM[j][i] = ttc; this.dM[i][j] = this.dM[j][i] = d;
+            if (ttc < a.minTTC) a.minTTC = ttc; if (ttc < b.minTTC) b.minTTC = ttc;
+          }
+          for (const r of R) for (const h of this.hazards) {
+            const rx = h.x - r.x, rz = h.z - r.z, d = Math.hypot(rx, rz) || 1e-6, cl = r.v * (r.dx * rx + r.dz * rz) / d;
+            if (cl > 0.05) { const ttc = Math.max(0, d - h.r - BODY) / cl; if (ttc < r.minTTC) r.minTTC = ttc; }
+          }
+          for (const r of R) {
+            let desired = VMAX; r.hold = null;
+            if (r.dwell > 0) { r.dwell -= dt; desired = 0; }
+            else if (!r.path.length && r.goal === null) {
+              if (r.retry > 0) { r.retry -= dt; desired = 0; } else if (!this.newGoal(r, false)) desired = 0;
+            }
+            if (this.improved && desired > 0) {
+              for (const h of this.hazards) {
+                if (h.state === 'MITIGATED') continue;
+                const look = r.stopDist + 1.2, px = r.x + r.dx * look, pz = r.z + r.dz * look;
+                const dd = Math.min(Math.hypot(px - h.x, pz - h.z), Math.hypot(r.x - h.x, r.z - h.z));
+                if (dd < h.r + BODY + 0.4) { desired = 0; r.hold = 'HAZARD'; break; }
+              }
+              if (!r.hold) {
+                for (const o of R) {
+                  if (o === r) continue;
+                  const ttc = this.ttcM[r.id][o.id], d = this.dM[r.id][o.id];
+                  const crit = isFinite(ttc) && d < 2 * BODY + r.stopDist + o.stopDist + 0.8;
+                  if (isFinite(ttc) && ttc < 2.4 && (r.id > o.id || crit)) { desired = 0; r.hold = 'TTC'; break; }
+                  const rx = o.x - r.x, rz = o.z - r.z;
+                  if (d < 1.5 && (r.dx * rx + r.dz * rz) > 0) { desired = 0; r.hold = 'TTC'; break; }
+                }
+              }
+            }
+            if (r.hold === 'TTC' && r.v < 0.05) { r.stuck += dt; } else if (!r.hold) { r.stuck = 0; }
+            if (r.stuck > 3 && r.goal !== null) {
+              r.stuck = 0; const cells = this.plan(r, r.goal % GW, (r.goal / GW) | 0, true);
+              if (cells) this.setPath(r, cells, true); else { r.path = []; r.pathCells = []; r.goal = null; this.newGoal(r, true); }
+            }
+            const pv = r.v;
+            if (r.v > desired) r.v = Math.max(desired, r.v - A_BRAKE * dt); else r.v = Math.min(desired, r.v + A_ACC * dt);
+            let remaining = r.v * dt; const x0 = r.x, z0 = r.z;
+            while (remaining > 1e-6 && r.path.length) {
+              const w = r.path[0], ddx = w.x - r.x, ddz = w.z - r.z, dd = Math.hypot(ddx, ddz);
+              if (dd < 1e-4) { r.path.shift(); continue; }
+              r.dx = ddx / dd; r.dz = ddz / dd;
+              if (dd <= remaining) { r.x = w.x; r.z = w.z; remaining -= dd; r.path.shift(); } else { r.x += r.dx * remaining; r.z += r.dz * remaining; remaining = 0; }
+            }
+            r.dist += Math.hypot(r.x - x0, r.z - z0);
+            if (r.goal !== null && !r.path.length) { r.picks++; this.m.picks++; r.goal = null; r.pathCells = []; r.dwell = 0.8 + r.rng() * 0.8; r.v = 0; }
+            else if (r.pathCells.length > 1) { const ci = z2cz(r.z) * GW + x2cx(r.x), k = r.pathCells.indexOf(ci); if (k > 0) r.pathCells.splice(0, k); }
+            const acc = Math.max(0, (r.v - pv) / dt);
+            r.kw = 0.18 + 0.52 * (r.v / VMAX) + 0.35 * (acc / A_ACC);
+            r.energyWh += r.kw * dt / 3.6; this.m.wh += r.kw * dt / 3.6;
+            if (r.hold) {
+              this.m.hold += dt;
+              if (r.hold !== r.holdPrev && this.emit && this.t - r.lastHoldEmit > 6) { r.lastHoldEmit = this.t; this.emit('HOLD', { id: r.id, reason: r.hold }); }
+            }
+            r.holdPrev = r.hold;
+          }
+          for (let i = 0; i < n; i++)for (let j = i + 1; j < n; j++) {
+            const d = this.dM[i][j], key = i * 8 + j; let st = this.pairState[key] | 0;
+            if (d < 1.0) { if (st !== 2) { this.m.col++; st = 2; if (this.emit) this.emit('COLLISION', { a: i, b: j, d }); } }
+            else if (d < 1.7) { if (st === 0) { this.m.nm++; st = 1; if (this.emit) this.emit('NEAR_MISS', { a: i, b: j, d }); } }
+            else if (d > 2.4) st = 0;
+            this.pairState[key] = st;
+          }
+          for (const h of this.hazards) for (const r of R) {
+            const key = h.id * 8 + r.id;
+            if (Math.hypot(r.x - h.x, r.z - h.z) < h.r) { if (!this.hvState[key]) { this.hvState[key] = 1; this.m.hv++; } }
+          }
+        }
+      }
+      function runScenario(seed, improved) {
+        const s = new FleetSim({ seed, improved, autoApprove: true, schedule: true });
+        for (let i = 0; i < 1200; i++)s.step(0.1);
+        return { nm: s.m.nm, col: s.m.col, hv: s.m.hv, picks: s.m.picks, wh: s.m.wh, hold: s.m.hold };
+      }
+
+      /* ================= audit trail ================= */
+      const audit = { chain: [], GEN: '0'.repeat(64) };
+      function auditHash(prev, idx, ts, ev, det) { return sha256(prev + '|' + idx + '|' + ts + '|' + ev + '|' + det); }
+      function auditLog(ev, det, cls) {
+        const prev = audit.chain.length ? audit.chain[audit.chain.length - 1].hash : audit.GEN;
+        const idx = audit.chain.length, ts = new Date().toISOString();
+        const e = { idx, ts, ev, det: det || '', prev, hash: auditHash(prev, idx, ts, ev, det || '') };
+        audit.chain.push(e); if (audit.chain.length > 3000) audit.chain.shift();
+        const row = document.createElement('div'); row.className = 'ae new ' + (cls || '');
+        row.innerHTML = '<span class="i">#' + idx + '</span><span class="t">' + ts.substr(11, 8) + '</span><span class="ev">' + ev + '</span><span class="d"></span><span class="h" title="' + e.hash + '">' + e.hash.substr(0, 16) + '…</span>';
+        row.querySelector('.d').textContent = e.det;
+        const list = $('#auditList'); list.insertBefore(row, list.firstChild);
+        while (list.children.length > 90) list.removeChild(list.lastChild);
+        $('#auditCount').textContent = audit.chain.length + ' blocks';
+      }
+      function verifyChain() {
+        let prev = audit.chain.length ? audit.chain[0].prev : audit.GEN, ok = true;
+        for (const e of audit.chain) { if (e.prev !== prev || auditHash(e.prev, e.idx, e.ts, e.ev, e.det) !== e.hash) { ok = false; break; } prev = e.hash; }
+        const s = $('#auditState'), c = $('#chainChip');
+        s.textContent = ok ? 'CHAIN VERIFIED' : 'CHAIN BROKEN'; s.style.color = ok ? 'var(--green)' : 'var(--red)';
+        $('#chainVal').textContent = ok ? 'VERIFIED' : 'BROKEN'; c.className = 'chip hide-sm ' + (ok ? 'ok' : 'bad');
+        return ok;
+      }
+
+      /* ================= live state ================= */
+      let sim;
+      const liveEmit = (type, d) => {
+        if (type === 'NEAR_MISS') auditLog('NEAR_MISS', 'AMR-' + (d.a + 1) + ' ↔ AMR-' + (d.b + 1) + ' d=' + d.d.toFixed(2) + 'm', 'warn');
+        else if (type === 'COLLISION') auditLog('COLLISION', 'AMR-' + (d.a + 1) + ' ↔ AMR-' + (d.b + 1) + ' d=' + d.d.toFixed(2) + 'm', 'crit');
+        else if (type === 'HOLD') auditLog('SAFETY_HOLD', 'AMR-' + (d.id + 1) + ' reason=' + d.reason, d.reason === 'HAZARD' ? 'crit' : '');
+      };
+      sim = new FleetSim({ seed: (Date.now() % 90000) + 1, improved: true, autoApprove: false, onEvent: liveEmit });
+      const stats = { reopts: 0, reroutes: 0, savedM: 0, lastReopt: '—', lastHaz: '—' };
+      let redMode = false, simSpeed = 1;
+
+      /* digital twin */
+      const twin = { drift: sim.robots.map(() => ({ x: 0, z: 0 })), bias: 0.03, idxHist: [], pwrHist: [], gap: 0 };
+      function updateTwin(dt) {
+        const envF = 1 + sim.hazards.length * 0.8 + (sim.improved ? 0 : 0.3);
+        for (const d of twin.drift) {
+          d.x += (-d.x * 0.12 + gauss() * 0.30 * envF) * dt; d.z += (-d.z * 0.12 + gauss() * 0.30 * envF) * dt;
+          d.x = clamp(d.x, -2.5, 2.5); d.z = clamp(d.z, -2.5, 2.5);
+        }
+        twin.bias = clamp(twin.bias + (-twin.bias * 0.02 + gauss() * 0.004 * envF) * dt, 0, 0.2);
+      }
+
+      /* ================= Three.js scene ================= */
+      const vp = $('#viewport');
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.domElement.className = 'gl'; vp.insertBefore(renderer.domElement, vp.firstChild);
+      const scene = new THREE.Scene(); scene.background = new THREE.Color(0x05070b); scene.fog = new THREE.Fog(0x05070b, 70, 140);
+      const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 300);
+
+      scene.add(new THREE.AmbientLight(0x7a9ab8, 0.55));
+      scene.add(new THREE.HemisphereLight(0x5e8fb8, 0x0a0d12, 0.45));
+      const sun = new THREE.DirectionalLight(0xcfe6ff, 0.85); sun.position.set(14, 34, 12); sun.castShadow = true;
+      sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 20, bottom: -20, near: 1, far: 90 }); scene.add(sun);
+      const rim = new THREE.PointLight(0x22d3ee, 0.6, 60); rim.position.set(0, 12, 0); scene.add(rim);
+
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(GW, GD), new THREE.MeshStandardMaterial({ color: 0x0b1219, roughness: 0.85, metalness: 0.2 }));
+      floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+      (function grid() {
+        const minor = [], major = [];
+        for (let x = -GW / 2; x <= GW / 2; x++) { (x % 4 === 0 ? major : minor).push(x, 0.01, -GD / 2, x, 0.01, GD / 2); }
+        for (let z = -GD / 2; z <= GD / 2; z++) { (z % 4 === 0 ? major : minor).push(-GW / 2, 0.01, z, GW / 2, 0.01, z); }
+        const mk = (arr, col, op) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3)); scene.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: op }))); };
+        mk(minor, 0x14293a, 0.65); mk(major, 0x1f5a72, 0.8);
+      })();
+      // perimeter wall
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0x101a24, roughness: 0.6, metalness: 0.4, emissive: 0x061c26 });
+      [[0, -GD / 2, GW + 0.4, 0.3], [0, GD / 2, GW + 0.4, 0.3], [-GW / 2, 0, 0.3, GD], [GW / 2, 0, 0.3, GD]].forEach(w => { const m = new THREE.Mesh(new THREE.BoxGeometry(w[2], 0.7, w[3]), wallMat); m.position.set(w[0], 0.35, w[1]); scene.add(m); });
+      // charging pads at start cells
+      AMR_COLORS.forEach((c, i) => { const r = sim.robots[i]; const p = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.18 })); p.rotation.x = -Math.PI / 2; p.position.set(r.x, 0.02, r.z); scene.add(p); });
+
+      // shelves
+      (function shelves() {
+        const m4 = new THREE.Matrix4(), nb = SHELF_X.length * SHELF_Z.length;
+        const steel = new THREE.MeshStandardMaterial({ color: 0x1b2a38, metalness: 0.7, roughness: 0.45 });
+        const plates = new THREE.InstancedMesh(new THREE.BoxGeometry(6, 0.06, 2), steel, nb * 3);
+        const posts = new THREE.InstancedMesh(new THREE.BoxGeometry(0.1, 2.5, 0.1), new THREE.MeshStandardMaterial({ color: 0x2e7d96, metalness: 0.6, roughness: 0.4, emissive: 0x0a2630 }), nb * 6);
+        const rng = mulberry32(77), cargo = []; let pi = 0, qi = 0;
+        for (const sx of SHELF_X) for (const sz of SHELF_Z) {
+          for (const ly of [0.35, 1.25, 2.15]) {
+            m4.makeTranslation(sx, ly, sz); plates.setMatrixAt(pi++, m4);
+            for (let i = 0; i < 5; i++)for (const dz of [-0.5, 0.5]) { if (rng() < 0.22) continue; cargo.push([sx - 2.4 + i * 1.2, ly + 0.28, sz + dz, rng()]); }
+          }
+          for (const px of [-2.95, 0, 2.95]) for (const pz of [-0.95, 0.95]) { m4.makeTranslation(sx + px, 1.25, sz + pz); posts.setMatrixAt(qi++, m4); }
+        }
+        plates.castShadow = plates.receiveShadow = true; posts.castShadow = true; scene.add(plates); scene.add(posts);
+        const boxes = new THREE.InstancedMesh(new THREE.BoxGeometry(0.88, 0.5, 0.88), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, metalness: 0.05 }), cargo.length);
+        const pal = [0x56687a, 0x7a6a4f, 0x4f6b5e, 0x6b4f5e, 0x3f5b78, 0x8a7a5a]; const col = new THREE.Color();
+        cargo.forEach((c, i) => { m4.makeTranslation(c[0], c[1], c[2]); boxes.setMatrixAt(i, m4); boxes.setColorAt(i, col.setHex(pal[Math.floor(c[3] * pal.length) % pal.length])); });
+        boxes.castShadow = boxes.receiveShadow = true; scene.add(boxes);
+      })();
+
+      // AMRs
+      function labelSprite(text, color) {
+        const c = document.createElement('canvas'); c.width = 160; c.height = 56; const x = c.getContext('2d');
+        x.fillStyle = 'rgba(6,10,14,.85)'; x.fillRect(0, 0, 160, 56); x.strokeStyle = color; x.lineWidth = 3; x.strokeRect(2, 2, 156, 52);
+        x.fillStyle = color; x.font = 'bold 26px monospace'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 80, 29);
+        const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); s.scale.set(2.2, 0.77, 1); return s;
+      }
+      const ringGeo = new THREE.RingGeometry(0.94, 1, 72), discGeo = new THREE.CircleGeometry(1, 56);
+      const amrViz = sim.robots.map(r => {
+        const g = new THREE.Group(); g.userData.amr = r.id;
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 0.38, 1), new THREE.MeshStandardMaterial({ color: 0x1d2a36, metalness: 0.7, roughness: 0.35 })); body.position.y = 0.3; body.castShadow = true; g.add(body);
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.02, 0.06, 1.02), new THREE.MeshStandardMaterial({ color: r.color, emissive: r.color, emissiveIntensity: 0.9 })); stripe.position.y = 0.36; g.add(stripe);
+        const lift = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.1, 24), new THREE.MeshStandardMaterial({ color: 0x34495c, metalness: 0.8, roughness: 0.3 })); lift.position.y = 0.54; g.add(lift);
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.7 })); nose.position.set(0, 0.32, 0.52); g.add(nose);
+        const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), new THREE.MeshBasicMaterial({ color: r.color })); beacon.position.set(0.35, 0.7, -0.35); g.add(beacon);
+        const lbl = labelSprite('AMR-' + (r.id + 1), hex(r.color)); lbl.position.y = 1.5; g.add(lbl);
+        scene.add(g);
+        const mkRing = (op) => { const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.y = 0.04; scene.add(m); return m; };
+        const outer = mkRing(0.7), inner = mkRing(0.95);
+        const disc = new THREE.Mesh(discGeo, new THREE.MeshBasicMaterial({ color: 0x34d399, transparent: true, opacity: 0.1, side: THREE.DoubleSide, depthWrite: false })); disc.rotation.x = -Math.PI / 2; disc.position.y = 0.035; scene.add(disc);
+        // routes
+        const MAXP = 80, posArr = new Float32Array(MAXP * 3);
+        const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.BufferAttribute(posArr, 3)); rg.setDrawRange(0, 0);
+        const route = new THREE.Line(rg, new THREE.LineBasicMaterial({ color: r.color, transparent: true, opacity: 0.95 })); route.frustumCulled = false; scene.add(route);
+        const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXP * 3), 3)); pg.setDrawRange(0, 0);
+        const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: r.color, size: 0.28, sizeAttenuation: true })); pts.frustumCulled = false; scene.add(pts);
+        const ogeo = new THREE.BufferGeometry(); ogeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXP * 3), 3)); ogeo.setDrawRange(0, 0);
+        const old = new THREE.Line(ogeo, new THREE.LineDashedMaterial({ color: 0xf43f5e, dashSize: 0.4, gapSize: 0.3, transparent: true, opacity: 0.9 })); old.frustumCulled = false; scene.add(old);
+        const goal = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.45, 24), new THREE.MeshBasicMaterial({ color: r.color, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })); goal.rotation.x = -Math.PI / 2; goal.position.y = 0.06; scene.add(goal);
+        // reality ghost
+        const ghost = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 0.4, 1)), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })); ghost.position.y = 0.3; ghost.visible = false; scene.add(ghost);
+        const gl = new THREE.BufferGeometry(); gl.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+        const link = new THREE.Line(gl, new THREE.LineBasicMaterial({ color: 0xf472b6, transparent: true, opacity: 0.8 })); link.visible = false; link.frustumCulled = false; scene.add(link);
+        return { g, beacon, outer, inner, disc, route, pts, old, goal, ghost, link, MAXP };
+      });
+      // pair TTC links
+      const pairLines = [];
+      for (let i = 0; i < 5; i++)for (let j = i + 1; j < 5; j++) {
+        const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+        const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.9 })); l.visible = false; l.frustumCulled = false; scene.add(l); pairLines.push({ i, j, l });
+      }
+
+      // hazards
+      const hazViz = new Map();
+      function addHazardViz(h) {
+        const g = new THREE.Group(); g.position.set(h.x, 0, h.z);
+        const disc = new THREE.Mesh(new THREE.CylinderGeometry(h.r, h.r, 0.06, 40), new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.3 })); disc.position.y = 0.04; g.add(disc);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(h.r - 0.08, h.r + 0.02, 48), new THREE.MeshBasicMaterial({ color: 0xf43f5e, side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.08; g.add(ring);
+        const keep = new THREE.Mesh(new THREE.RingGeometry(h.r + 0.82, h.r + 0.9, 48), new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.7 })); keep.rotation.x = -Math.PI / 2; keep.position.y = 0.07; keep.visible = false; g.add(keep);
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.8, 4), new THREE.MeshStandardMaterial({ color: 0xff5470, emissive: 0xff2a4d, emissiveIntensity: 0.9 })); cone.position.y = 0.4; g.add(cone);
+        const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 5, 8), new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.5 })); beam.position.y = 2.5; g.add(beam);
+        const lbl = labelSprite(h.kind, '#f43f5e'); lbl.position.y = 2.2; lbl.scale.set(3, 1.05, 1); g.add(lbl);
+        scene.add(g); hazViz.set(h.id, { g, disc, ring, keep, cone, beam });
+      }
+      function removeHazardViz(id) { const v = hazViz.get(id); if (v) { scene.remove(v.g); hazViz.delete(id); } }
+
+      /* ---- camera: custom orbit / pan / zoom / follow ---- */
+      const DEF = { theta: 0, phi: 0.78, r: 46, t: new THREE.Vector3(0, 0, 0) };
+      const o = { theta: DEF.theta, phi: DEF.phi, r: DEF.r, t: DEF.t.clone() };
+      const goalCam = { theta: DEF.theta, phi: DEF.phi, r: DEF.r, t: DEF.t.clone() };
+      let anim = false, followId = null, yawOff = 0, followPhi = 1.0, followDist = 14;
+      function setFollow(id) {
+        followId = id; anim = false; yawOff = 0; followPhi = 1.0; followDist = 14;
+        $('#selFollow').value = id === null ? '' : String(id);
+        $('#hudCam').textContent = id === null ? 'FREE CAM' : 'FOLLOW · AMR-' + (id + 1);
+        $$('.amr').forEach(e => e.classList.toggle('sel', id !== null && +e.dataset.id === id));
+      }
+      function resetView() { setFollow(null); goalCam.theta = DEF.theta; goalCam.phi = DEF.phi; goalCam.r = DEF.r; goalCam.t.copy(DEF.t); anim = true; $('#hudCam').textContent = 'FREE CAM · RESET'; }
+      function updateCamera() {
+        if (followId !== null) {
+          const r = sim.robots[followId];
+          o.t.lerp(new THREE.Vector3(r.x, 0.4, r.z), 0.12);
+          o.theta = lerpAngle(o.theta, Math.atan2(-r.dx, -r.dz) + yawOff, 0.06);
+          o.phi += (followPhi - o.phi) * 0.08; o.r += (followDist - o.r) * 0.08;
+        } else if (anim) {
+          o.t.lerp(goalCam.t, 0.12); o.theta = lerpAngle(o.theta, goalCam.theta, 0.12); o.phi += (goalCam.phi - o.phi) * 0.12; o.r += (goalCam.r - o.r) * 0.12;
+          if (Math.abs(o.r - goalCam.r) < 0.05 && o.t.distanceTo(goalCam.t) < 0.05 && Math.abs(o.phi - goalCam.phi) < 0.005) { anim = false; $('#hudCam').textContent = 'FREE CAM'; }
+        }
+        const sp = Math.sin(o.phi);
+        camera.position.set(o.t.x + o.r * sp * Math.sin(o.theta), o.t.y + o.r * Math.cos(o.phi), o.t.z + o.r * sp * Math.cos(o.theta));
+        camera.lookAt(o.t);
+      }
+      const dom = renderer.domElement; let drag = null;
+      dom.addEventListener('contextmenu', e => e.preventDefault());
+      dom.addEventListener('pointerdown', e => { try { dom.setPointerCapture(e.pointerId); } catch (_) { } drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, btn: e.button, shift: e.shiftKey, moved: false }; });
+      dom.addEventListener('pointermove', e => {
+        if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+        if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 4) drag.moved = true; if (!drag.moved) return;
+        anim = false;
+        if ((drag.btn === 2 || drag.shift) && followId === null) {
+          const k = o.r * 0.0016, rx = Math.cos(o.theta), rz = -Math.sin(o.theta), fx = -Math.sin(o.theta), fz = -Math.cos(o.theta);
+          o.t.x = clamp(o.t.x - rx * dx * k + fx * dy * k, -30, 30); o.t.z = clamp(o.t.z - rz * dx * k + fz * dy * k, -24, 24);
+        } else if (followId !== null) { yawOff -= dx * 0.006; followPhi = clamp(followPhi - dy * 0.006, 0.2, 1.45); }
+        else { o.theta -= dx * 0.006; o.phi = clamp(o.phi - dy * 0.006, 0.15, 1.5); }
+      });
+      dom.addEventListener('pointerup', e => { if (drag && !drag.moved && drag.btn === 0) handleClick(e); drag = null; });
+      dom.addEventListener('wheel', e => { e.preventDefault(); const f = Math.exp(e.deltaY * 0.001); if (followId !== null) followDist = clamp(followDist * f, 5, 40); else { anim = false; o.r = clamp(o.r * f, 8, 90); } }, { passive: false });
+
+      const raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2(), floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      function handleClick(e) {
+        const rc = dom.getBoundingClientRect(); mouse.set(((e.clientX - rc.left) / rc.width) * 2 - 1, -((e.clientY - rc.top) / rc.height) * 2 + 1); raycaster.setFromCamera(mouse, camera);
+        if (redMode) {
+          const p = new THREE.Vector3(); if (raycaster.ray.intersectPlane(floorPlane, p)) {
+            const ix = x2cx(p.x), iz = z2cz(p.z);
+            if (Math.abs(p.x) > GW / 2 || Math.abs(p.z) > GD / 2) { toast('Click inside the warehouse floor.'); return; }
+            if (blocked[iz * GW + ix]) { toast('Hazards must be placed in an aisle, not on a shelf.'); return; }
+            injectHazard(cx2x(ix), cz2z(iz));
+          }
+          return;
+        }
+        const hits = raycaster.intersectObjects(amrViz.map(a => a.g), true);
+        if (hits.length) { let t = hits[0].object; while (t && t.userData.amr === undefined) t = t.parent; if (t) setFollow(t.userData.amr); }
+      }
+      function resize() { const w = vp.clientWidth, h = vp.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+      new ResizeObserver(resize).observe(vp); window.addEventListener('resize', resize); resize();
+
+      /* ================= toast ================= */
+      let toastT = 0;
+      function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200); }
+
+      /* ================= Red Team + approval workflow ================= */
+      let queue = [], proposalSeq = 0, modalOpen = false;
+      function setRed(on) {
+        redMode = on; $('#btnRed').classList.toggle('on', on); $('#redState').textContent = on ? 'ARMED' : 'OFF';
+        const h = $('#hudMode'); h.classList.toggle('red', on); h.textContent = on ? 'RED TEAM ARMED — CLICK AN AISLE TO INJECT HAZARD' : 'NOMINAL OPERATIONS';
+        dom.style.cursor = on ? 'crosshair' : '';
+        auditLog(on ? 'RED_TEAM_ARMED' : 'RED_TEAM_DISARMED', 'operator=OP-7', on ? 'warn' : '');
+      }
+      function injectHazard(x, z, type) {
+        const ty = type || HAZ_TYPES[Math.floor(Math.random() * HAZ_TYPES.length)];
+        const h = sim.addHazard(x, z, ty.r, ty.k); addHazardViz(h);
+        stats.lastHaz = ty.k + ' @ (' + x.toFixed(1) + ', ' + z.toFixed(1) + ')';
+        auditLog('HAZARD_INJECTED', ty.k + ' r=' + ty.r + 'm at (' + x.toFixed(1) + ',' + z.toFixed(1) + ') safety=' + (sim.improved ? 'ON' : 'OFF'), 'crit');
+        if (!sim.improved) { toast('Hazard injected — safety stack is OFF, AMRs will ignore it.'); return h; }
+        const prev = sim.previewHazard(h);
+        const extra = prev.reduce((s, p) => s + (p.nw !== null ? p.nw - p.old : 0), 0);
+        openProposal({
+          type: 'HAZARD', hazard: h, title: 'Hazard mitigation: reroute fleet', risk: 'HIGH',
+          desc: 'A ' + ty.k.toLowerCase() + ' was detected. Affected AMRs are in safe hold at the keep-out boundary. Approve to reroute them around a ' + (h.r + 0.9).toFixed(1) + ' m keep-out zone. Reject keeps affected AMRs in safe hold until the hazard is cleared. Cancel defers the decision (AMRs stay held).',
+          rows: [['Hazard', ty.k], ['Location', '(' + x.toFixed(1) + ', ' + z.toFixed(1) + ') m'], ['Keep-out radius', (h.r + 0.9).toFixed(1) + ' m'], ['AMRs affected', prev.length ? prev.map(p => 'AMR-' + (p.id + 1)).join(', ') : 'none on current routes'], ['Est. detour', (extra >= 0 ? '+' : '') + extra.toFixed(0) + ' m total'], ['Est. delay', '+' + (Math.max(0, extra) / VMAX).toFixed(0) + ' s fleet-wide'], ['Risk if rejected', 'AMRs held until cleared']]
+        });
+        return h;
+      }
+      function requestOptimization() {
+        if (!sim.improved) { toast('Enable the safety stack to use route optimization.'); return; }
+        if (queue.some(p => p.type === 'OPTIMIZE')) { toast('An optimization request is already pending.'); openModalIfNeeded(); return; }
+        const opt = sim.computeOptimization();
+        const ovTxt = opt.before.ov + ' → ' + opt.after.ov + ' cells';
+        openProposal({
+          type: 'OPTIMIZE', title: 'Apply optimized fleet routes', risk: 'MED',
+          desc: 'Congestion-aware A* found alternative routes that reduce shared aisle cells between AMRs. Approve to switch the affected AMRs to the new routes. Reject discards the proposal. Cancel keeps it pending.',
+          rows: [['Routes changed', opt.changes.length + ' of 5 AMRs'], ['Remaining path length', opt.before.len.toFixed(0) + ' → ' + opt.after.len.toFixed(0) + ' m'], ['Shared route cells', ovTxt], ['Congestion relief', opt.before.ov ? Math.max(0, Math.round(100 * (opt.before.ov - opt.after.ov) / opt.before.ov)) + '%' : '0%'], ['Safety stack', 'TTC braking stays active']]
+        });
+      }
+      function openProposal(p) {
+        p.id = ++proposalSeq; p.state = 'PENDING'; queue.push(p);
+        auditLog('APPROVAL_REQUESTED', '#' + p.id + ' ' + p.type + ' risk=' + p.risk, 'warn');
+        refreshApprovalBadge(); openModalIfNeeded();
+      }
+      function refreshApprovalBadge() {
+        $('#approvalCount').textContent = queue.length; $('#btnApprovals').classList.toggle('has', queue.length > 0);
+      }
+      function openModalIfNeeded() { if (!queue.length) return; showModal(); }
+      function showModal() {
+        const p = queue[0]; if (!p) { closeModal(); return; }
+        modalOpen = true; $('#modal').classList.add('open'); $('#mCard').classList.toggle('hz', p.type === 'HAZARD');
+        $('#mTitle').textContent = p.title; $('#mDesc').textContent = p.desc;
+        const b = $('#mBadge'); b.textContent = p.state === 'DEFERRED' ? 'DEFERRED' : p.risk + ' RISK'; b.className = 'badge ' + (p.risk === 'HIGH' ? 'bad' : 'warn');
+        const g = $('#mGrid'); g.innerHTML = ''; p.rows.forEach(r => { const a = document.createElement('span'), c = document.createElement('span'); a.textContent = r[0]; c.textContent = r[1]; g.appendChild(a); g.appendChild(c); });
+        $('#mQueue').textContent = 'Request 1 of ' + queue.length + ' · #' + p.id;
+      }
+      function closeModal() { modalOpen = false; $('#modal').classList.remove('open'); }
+      function resolveProposal(action) {
+        const p = queue[0]; if (!p) return;
+        if (action === 'cancel') {
+          p.state = 'DEFERRED'; queue.push(queue.shift());
+          auditLog('APPROVAL_DEFERRED', '#' + p.id + ' ' + p.type + ' operator=OP-7 (stays pending)', 'warn');
+          toast('Decision deferred — request #' + p.id + ' remains pending.');
+          closeModal(); refreshApprovalBadge(); return;
+        }
+        queue.shift();
+        if (action === 'approve') {
+          if (p.type === 'HAZARD') {
+            const h = p.hazard;
+            if (sim.hazards.includes(h)) {
+              const info = sim.mitigate(h); stats.reroutes += info.rerouted; stats.savedM -= info.extra;
+              auditLog('APPROVAL_APPROVED', '#' + p.id + ' HAZARD reroute: ' + info.rerouted + ' AMR(s), ' + (info.extra >= 0 ? '+' : '') + info.extra.toFixed(0) + ' m', 'good');
+              toast('Approved — ' + info.rerouted + ' AMR(s) rerouted around the hazard.');
+            }
+          } else {
+            const opt = sim.computeOptimization(); const n = sim.applyOptimization(opt.changes);
+            stats.reopts++; stats.reroutes += n; stats.savedM += opt.before.len - opt.after.len; stats.lastReopt = new Date().toLocaleTimeString();
+            auditLog('APPROVAL_APPROVED', '#' + p.id + ' OPTIMIZE: ' + n + ' routes changed, shared cells ' + opt.before.ov + '→' + opt.after.ov, 'good');
+            auditLog('ROUTE_REOPT_APPLIED', n + ' route(s) updated', 'good');
+            toast('Approved — ' + n + ' route(s) updated.');
+          }
+        } else {
+          if (p.type === 'HAZARD' && p.hazard) p.hazard.state = 'REJECTED';
+          auditLog('APPROVAL_REJECTED', '#' + p.id + ' ' + p.type + ' operator=OP-7' + (p.type === 'HAZARD' ? ' — AMRs remain in safe hold' : ''), 'crit');
+          toast(p.type === 'HAZARD' ? 'Rejected — affected AMRs stay in safe hold until the hazard is cleared.' : 'Optimization rejected.');
+        }
+        refreshApprovalBadge();
+        if (queue.length) showModal(); else closeModal();
+      }
+      function clearHazards() {
+        if (!sim.hazards.length) { toast('No hazards to clear.'); return; }
+        const n = sim.hazards.length;
+        sim.hazards.forEach(h => removeHazardViz(h.id));
+        queue = queue.filter(p => p.type !== 'HAZARD'); sim.hazards = [];
+        auditLog('HAZARDS_CLEARED', n + ' hazard(s) removed; fleet resumes', 'good');
+        refreshApprovalBadge(); if (queue.length) showModal(); else closeModal();
+        toast('Hazards cleared — fleet resuming.');
+      }
+      $('#mApprove').onclick = () => resolveProposal('approve');
+      $('#mReject').onclick = () => resolveProposal('reject');
+      $('#mCancel').onclick = () => resolveProposal('cancel');
+      $('#modal').addEventListener('pointerdown', e => { if (e.target === $('#modal')) resolveProposal('cancel'); });
+      $('#btnApprovals').onclick = () => { if (queue.length) showModal(); else toast('No approvals pending.'); };
+      $('#btnRed').onclick = () => setRed(!redMode);
+      $('#btnInject').onclick = () => {
+        const cands = sim.robots.filter(r => r.pathCells.length > 8);
+        let x, z;
+        if (cands.length) { const r = cands[Math.floor(Math.random() * cands.length)]; const ci = r.pathCells[Math.min(r.pathCells.length - 1, 6 + Math.floor(Math.random() * 4))]; x = cx2x(ci % GW); z = cz2z((ci / GW) | 0); }
+        else { let c; do { c = Math.floor(Math.random() * N); } while (blocked[c]); x = cx2x(c % GW); z = cz2z((c / GW) | 0); }
+        injectHazard(x, z);
+      };
+      $('#btnClear').onclick = clearHazards;
+      $('#btnOptimize').onclick = requestOptimization; $('#btnOptimize2').onclick = requestOptimization;
+      $('#chkSafety').onchange = e => { sim.improved = e.target.checked; auditLog('SAFETY_STACK', sim.improved ? 'ENABLED' : 'DISABLED — AMRs ignore TTC and hazards', sim.improved ? 'good' : 'crit'); toast('Safety stack ' + (sim.improved ? 'enabled' : 'DISABLED')); };
+      $('#selSpeed').onchange = e => { simSpeed = +e.target.value; };
+      $('#selFollow').onchange = e => { e.target.value === '' ? resetView() : setFollow(+e.target.value); };
+      $('#btnFollow').onclick = () => { const v = $('#selFollow').value; setFollow(v === '' ? 0 : +v); };
+      $('#btnReset').onclick = resetView;
+      $('#btnVerify').onclick = () => { const ok = verifyChain(); auditLog('CHAIN_VERIFY', ok ? 'all ' + audit.chain.length + ' blocks valid' : 'MISMATCH DETECTED', ok ? 'good' : 'crit'); };
+      $('#rngHorizon').oninput = e => { $('#horizonVal').textContent = (+e.target.value).toFixed(1) + ' s'; };
+      $('#btnRecal').onclick = () => { twin.drift.forEach(d => { d.x = 0; d.z = 0; }); twin.bias = 0.02; auditLog('TWIN_RECALIBRATED', 'drift reset, energy bias 2.0%', 'good'); toast('Digital twin recalibrated.'); };
+      $$('.tab').forEach(b => b.onclick = () => { $$('.tab').forEach(x => x.classList.toggle('on', x === b)); $$('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + b.dataset.tab)); drawCharts(); });
+
+      document.addEventListener('keydown', e => {
+        if (/INPUT|SELECT|TEXTAREA/.test((e.target.tagName || ''))) return;
+        if (modalOpen) { if (e.key === 'Escape') resolveProposal('cancel'); return; }
+        if (e.key >= '1' && e.key <= '5') setFollow(+e.key - 1);
+        else if (e.key === '0' || e.key === 'Escape') resetView();
+        else if (e.key === 'r' || e.key === 'R') setRed(!redMode);
+      });
+
+      /* ================= charts (2D canvas) ================= */
+      function fit(c) {
+        const r = c.getBoundingClientRect(), d = window.devicePixelRatio || 1, w = Math.floor(r.width), h = Math.floor(r.height);
+        if (w < 10 || h < 10) return null;
+        if (c.width !== w * d || c.height !== h * d) { c.width = w * d; c.height = h * d; }
+        const x = c.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, w, h); return { x, w, h };
+      }
+      function lineChart(c, series, opt) {
+        const f = fit(c); if (!f) return; const { x, w, h } = f, p = { l: 34, r: 8, t: 8, b: 16 }; opt = opt || {};
+        let mn = opt.min, mx = opt.max;
+        if (mn == null || mx == null) { let a = Infinity, b = -Infinity; series.forEach(s => s.data.forEach(v => { if (v < a) a = v; if (v > b) b = v; })); if (!isFinite(a)) { a = 0; b = 1; } if (mn == null) mn = Math.min(0, a); if (mx == null) mx = b + (b - a) * 0.15 + 1e-6; }
+        x.font = '10px monospace'; x.fillStyle = '#6f8799'; x.strokeStyle = '#17242f'; x.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) { const yy = p.t + (h - p.t - p.b) * i / 4; x.beginPath(); x.moveTo(p.l, yy); x.lineTo(w - p.r, yy); x.stroke(); const val = mx - (mx - mn) * i / 4; x.fillText(val.toFixed(opt.dec != null ? opt.dec : 1), 2, yy + 3); }
+        series.forEach(s => {
+          if (s.data.length < 2) return; x.strokeStyle = s.color; x.lineWidth = 1.6; x.beginPath();
+          s.data.forEach((v, i) => { const px = p.l + (w - p.l - p.r) * i / Math.max(1, (opt.n || s.data.length) - 1), py = p.t + (h - p.t - p.b) * (1 - (v - mn) / (mx - mn || 1)); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke();
+        });
+        if (series.length > 1 || opt.legend) { let lx = p.l + 4; series.forEach(s => { x.fillStyle = s.color; x.fillRect(lx, h - 11, 8, 3); x.fillStyle = '#8ea6b8'; x.fillText(s.label, lx + 11, h - 6); lx += x.measureText(s.label).width + 26; }); }
+      }
+      function groupBars(c, groups) {
+        const f = fit(c); if (!f) return; const { x, w, h } = f, p = { l: 6, r: 6, t: 14, b: 30 }, gw = (w - p.l - p.r) / groups.length;
+        x.font = '10px monospace';
+        groups.forEach((g, i) => {
+          const mx = Math.max(g.a, g.b, 1e-9), bw = Math.min(26, gw / 3), x0 = p.l + gw * i + gw / 2 - bw - 2, ch = h - p.t - p.b;
+          [[g.a, '#f43f5e', 0], [g.b, '#22d3ee', 1]].forEach(([v, col, k]) => {
+            const bh = ch * v / mx, bx = x0 + k * (bw + 4); x.fillStyle = col; x.fillRect(bx, p.t + ch - bh, bw, bh);
+            x.fillStyle = '#cfe3ee'; x.textAlign = 'center'; x.fillText(g.fmt(v), bx + bw / 2, p.t + ch - bh - 3);
+          });
+          x.fillStyle = '#6f8799'; x.textAlign = 'center'; x.fillText(g.label, p.l + gw * i + gw / 2, h - 14); if (g.sub) x.fillText(g.sub, p.l + gw * i + gw / 2, h - 4);
+        });
+        x.textAlign = 'left';
+      }
+
+      /* ================= Scenario Lab ================= */
+      const lab = { base: null, imp: null, sum: null, seed: null, digests: new Map(), running: false };
+      function mean(a, k) { return a.reduce((s, o) => s + o[k], 0) / a.length; }
+      function runLab() {
+        if (lab.running) return; lab.running = true;
+        const seed = parseInt($('#inpSeed').value, 10) || 2026; const base = [], imp = []; let i = 0;
+        $('#btnRunLab').disabled = true; $('#btnVerifyLab').disabled = true;
+        auditLog('SCENARIO_BENCH_START', 'seed=' + seed + ' runs=100');
+        const t0 = performance.now();
+        (function chunk() {
+          const end = Math.min(100, i + 3);
+          for (; i < end; i++) { base.push(runScenario(seed + i, false)); imp.push(runScenario(seed + i, true)); }
+          $('#labBar').style.width = i + '%'; $('#labProg').textContent = 'Running scenario ' + i + ' / 100 (×2 policies)…';
+          if (i < 100) return void setTimeout(chunk, 0);
+          finishLab(seed, base, imp, performance.now() - t0);
+        })();
+      }
+      function finishLab(seed, base, imp, ms) {
+        const rnd = a => a.map(o => [o.nm, o.col, o.hv, o.picks, +o.wh.toFixed(3), +o.hold.toFixed(2)]);
+        const digest = sha256(JSON.stringify([seed, rnd(base), rnd(imp)]));
+        const prev = lab.digests.get(seed); lab.digests.set(seed, digest);
+        const S = a => ({ nm: mean(a, 'nm'), col: mean(a, 'col'), hv: mean(a, 'hv'), tp: mean(a, 'picks') * 30, kwh: mean(a, 'wh') * 30 / 1000, hold: mean(a, 'hold') / (120 * 5) * 100 });
+        const sb = S(base), si = S(imp); sb.ppk = sb.tp / Math.max(sb.kwh, 1e-9); si.ppk = si.tp / Math.max(si.kwh, 1e-9);
+        Object.assign(lab, { base, imp, sum: { b: sb, i: si }, seed, digest, repro: prev === undefined ? null : prev === digest });
+        lab.running = false; $('#btnRunLab').disabled = false; $('#btnVerifyLab').disabled = false;
+        $('#labBar').style.width = '100%'; $('#labProg').textContent = 'Completed 200 simulations in ' + (ms / 1000).toFixed(1) + ' s (seed ' + seed + ').';
+        auditLog('SCENARIO_BENCH_DONE', 'seed=' + seed + ' nearMiss ' + sb.nm.toFixed(2) + '→' + si.nm.toFixed(2) + ' digest=' + digest.substr(0, 12), 'good');
+        renderLab();
+      }
+      function renderLab() {
+        if (!lab.sum) return; $('#labResults').style.display = 'block';
+        const b = lab.sum.b, i = lab.sum.i;
+        const rows = [['Near-misses / run', b.nm, i.nm, 2, true], ['Collisions / run', b.col, i.col, 2, true], ['Hazard violations / run', b.hv, i.hv, 2, true], ['Throughput (picks/hr)', b.tp, i.tp, 0, false], ['Fleet energy (kWh/hr)', b.kwh, i.kwh, 2, true], ['Picks per kWh', b.ppk, i.ppk, 0, false], ['Time in safety hold %', b.hold, i.hold, 1, true]];
+        $('#labTable').innerHTML = rows.map(r => {
+          const d = r[1] === 0 ? (r[2] === 0 ? 0 : 100) : (r[2] - r[1]) / r[1] * 100; const better = r[4] ? d < 0 : d > 0;
+          return '<tr><td>' + r[0] + '</td><td class="r">' + r[1].toFixed(r[3]) + '</td><td class="r">' + r[2].toFixed(r[3]) + '</td><td class="r ' + (Math.abs(d) < 0.5 ? '' : (better ? 'good' : 'bad')) + '">' + (d > 0 ? '+' : '') + d.toFixed(0) + '%</td></tr>';
+        }).join('');
+        const rp = lab.repro === null ? 'First run for this seed — run again to verify repeatability.' : (lab.repro ? 'REPRODUCED ✓ identical digest to the previous run with this seed.' : 'MISMATCH ✗ digest differs from the previous run.');
+        $('#labDigest').innerHTML = 'RESULT DIGEST (SHA-256)<br>' + lab.digest + '<br><span style="color:' + (lab.repro === false ? 'var(--red)' : (lab.repro ? 'var(--green)' : 'var(--dim)')) + '">' + rp + '</span>';
+        drawCharts();
+      }
+      $('#btnRunLab').onclick = runLab;
+      $('#btnVerifyLab').onclick = runLab;
+
+      /* ================= UI refresh ================= */
+      function stateOf(r) { if (r.hold === 'HAZARD') return ['HOLD·HAZARD', 'hd']; if (r.hold === 'TTC') return ['HOLD·TTC', 'hd']; if (r.dwell > 0) return ['PICKING', 'dw']; if (r.v < 0.05 && r.goal === null) return ['IDLE', 'wn']; return ['MOVING', 'ok']; }
+      const ttcCls = t => t > 4 ? 'good' : (t > 2 ? 'warnc' : 'bad');
+      function ringColor(t) { return t > 4 ? 0x34d399 : (t > 2 ? 0xfbbf24 : 0xf43f5e); }
+      function fleetMetrics() {
+        const R = sim.robots; let mt = Infinity, mi = -1; R.forEach(r => { if (r.minTTC < mt) { mt = r.minTTC; mi = r.id; } });
+        const holds = R.filter(r => r.hold).length;
+        let lvl = 'LOW'; if (mt < 1 || sim.hazards.some(h => h.state === 'REJECTED')) lvl = 'HIGH'; else if (mt < 2.5 || sim.hazards.some(h => h.state !== 'MITIGATED')) lvl = 'MED';
+        return { mt, mi, holds, lvl };
+      }
+      function updateTwinGap() {
+        const R = sim.robots, hz = sim.hazards.length; let sumPos = 0, sumEta = 0; const rows = [];
+        R.forEach((r, i) => { const d = twin.drift[i], pe = Math.hypot(d.x, d.z), eta = (r.pathCells.length ? sim.remLen(r) : 0) / VMAX, ee = eta * twin.bias * 1.5 + pe * 0.5, en = (twin.bias + 0.01 * pe) * 100; sumPos += pe; sumEta += ee; rows.push([i, pe, ee, en]); });
+        const mp = sumPos / R.length, me = sumEta / R.length;
+        twin.gap = clamp(100 * (0.5 * mp / 2.0 + 0.3 * twin.bias / 0.15 + 0.2 * me / 6), 0, 100); twin.rows = rows; twin.hz = hz;
+      }
+      function ui() {
+        const R = sim.robots, fm = fleetMetrics();
+        $('#simTime').textContent = pad2(Math.floor(sim.t / 60)) + ':' + pad2(Math.floor(sim.t % 60));
+        const rv = $('#riskVal'); rv.textContent = fm.lvl; $('#riskChip').className = 'chip ' + (fm.lvl === 'LOW' ? 'ok' : (fm.lvl === 'MED' ? 'warn' : 'bad'));
+        $('#clock').textContent = new Date().toLocaleTimeString();
+        // roster
+        $('#roster').innerHTML = R.map(r => {
+          const s = stateOf(r), bat = Math.max(0, 100 - (r.energyWh / 1000) / 2.4 * 100);
+          return '<div class="amr' + (followId === r.id ? ' sel' : '') + '" data-id="' + r.id + '"><span class="dot" style="background:' + hex(r.color) + '"></span><b>AMR-' + (r.id + 1) + '</b><span class="st ' + s[1] + '">' + s[0] + '</span><span class="sub">v ' + r.v.toFixed(1) + ' m/s · bat ' + bat.toFixed(2) + '% · picks ' + r.picks + '</span></div>';
+        }).join('');
+        $$('#roster .amr').forEach(e => e.onclick = () => setFollow(+e.dataset.id));
+        // safety
+        $('#riskText').textContent = fm.lvl; $('#riskText').style.color = fm.lvl === 'LOW' ? 'var(--green)' : (fm.lvl === 'MED' ? 'var(--amber)' : 'var(--red)');
+        $('#riskBar').style.width = (isFinite(fm.mt) ? clamp(100 * (1 - fm.mt / 6), 4, 100) : 4) + '%';
+        $('#minTtc').textContent = isFinite(fm.mt) ? fm.mt.toFixed(2) + ' s (AMR-' + (fm.mi + 1) + ')' : '—';
+        $('#holdCount').textContent = fm.holds; $('#hazCount').textContent = sim.hazards.length; $('#nmCount').textContent = sim.m.nm + ' / ' + sim.m.col;
+        const hz = +$('#rngHorizon').value;
+        $('#ttcTable').innerHTML = R.map(r => {
+          const s = stateOf(r), ring = BODY + r.stopDist + r.v * hz;
+          return '<tr><td style="color:' + hex(r.color) + '">AMR-' + (r.id + 1) + '</td><td class="r">' + r.v.toFixed(2) + '</td><td class="r">' + r.stopDist.toFixed(2) + '</td><td class="r">' + ring.toFixed(2) + '</td><td class="r ' + ttcCls(r.minTTC) + '">' + (isFinite(r.minTTC) ? r.minTTC.toFixed(1) : '—') + '</td><td><span class="st ' + s[1] + '">' + s[0] + '</span></td></tr>';
+        }).join('');
+        // route + energy
+        const totLen = R.reduce((s, r) => s + sim.remLen(r), 0), ov = overlapCount(R.map(r => r.pathCells));
+        $('#routeStats').innerHTML = '<span>Active routes</span><span>' + R.filter(r => r.path.length).length + ' / 5</span><span>Remaining path length</span><span>' + totLen.toFixed(0) + ' m</span><span>Shared route cells</span><span>' + ov + '</span><span>Approved optimizations</span><span>' + stats.reopts + '</span><span>Routes changed (total)</span><span>' + stats.reroutes + '</span><span>Net path saved</span><span class="' + (stats.savedM >= 0 ? 'good' : 'warnc') + '">' + (stats.savedM >= 0 ? '' : '') + stats.savedM.toFixed(0) + ' m</span><span>Last optimization</span><span>' + stats.lastReopt + '</span><span>Last hazard</span><span>' + stats.lastHaz + '</span>';
+        const kwh = sim.m.wh / 1000, kw = R.reduce((s, r) => s + r.kw, 0), proj = sim.t > 5 ? kwh / sim.t * 3600 * 8 : kw * 8;
+        $('#energyStats').innerHTML = '<span>Fleet consumption</span><span>' + kwh.toFixed(4) + ' kWh</span><span>Current draw</span><span>' + kw.toFixed(2) + ' kW</span><span>Projected 8 h shift</span><span>' + proj.toFixed(1) + ' kWh</span><span>Picks per kWh</span><span>' + (kwh > 0 ? (sim.m.picks / kwh).toFixed(0) : '—') + '</span><span>Time in safety hold</span><span>' + (sim.m.hold / Math.max(1, sim.t * 5) * 100).toFixed(1) + '%</span>';
+        const mxw = Math.max(...R.map(r => r.energyWh), 1e-6);
+        $('#energyBars').innerHTML = R.map(r => '<div class="ebar"><span style="color:' + hex(r.color) + '">AMR-' + (r.id + 1) + '</span><div class="tr"><div style="width:' + (100 * r.energyWh / mxw).toFixed(0) + '%;background:' + hex(r.color) + '"></div></div><span>' + (r.energyWh / 1000).toFixed(4) + '</span></div>').join('');
+        // twin
+        updateTwinGap();
+        $('#twinIdx').textContent = twin.gap.toFixed(0); $('#twinBar').style.width = twin.gap + '%';
+        const tb = $('#twinBadge'), st = twin.gap < 30 ? ['SYNCED', 'ok'] : (twin.gap < 60 ? ['DRIFT', 'warn'] : ['DIVERGED', 'bad']); tb.textContent = st[0]; tb.className = 'badge ' + st[1];
+        $('#twinTable').innerHTML = twin.rows.map(r => '<tr><td style="color:' + hex(R[r[0]].color) + '">AMR-' + (r[0] + 1) + '</td><td class="r">' + r[1].toFixed(2) + '</td><td class="r">' + r[2].toFixed(1) + '</td><td class="r">' + r[3].toFixed(1) + '</td></tr>').join('');
+        // hud mode
+        if (!redMode) { const h = $('#hudMode'); if (fm.holds > 0) { h.textContent = 'SAFETY HOLD · ' + fm.holds + ' AMR(s)'; h.style.color = 'var(--amber)'; } else { h.textContent = 'NOMINAL OPERATIONS'; h.style.color = ''; } }
+        else $('#hudMode').style.color = '';
+        drawCharts();
+      }
+      function drawCharts() {
+        if ($('#pane-fleet').classList.contains('on')) lineChart($('#cvPower'), [{ data: twin.pwrHist, color: '#22d3ee', label: 'kW' }], { min: 0, n: 120, dec: 1 });
+        if ($('#pane-twin').classList.contains('on')) lineChart($('#cvTwin'), [{ data: twin.idxHist, color: '#f472b6', label: 'gap' }], { min: 0, max: 100, n: 120, dec: 0 });
+        if ($('#pane-lab').classList.contains('on') && lab.sum) {
+          const b = lab.sum.b, i = lab.sum.i;
+          groupBars($('#cvLabBars'), [
+            { label: 'near-miss', sub: '/run', a: b.nm, b: i.nm, fmt: v => v.toFixed(1) },
+            { label: 'collide', sub: '/run', a: b.col, b: i.col, fmt: v => v.toFixed(1) },
+            { label: 'haz viol', sub: '/run', a: b.hv, b: i.hv, fmt: v => v.toFixed(1) },
+            { label: 'picks/hr', sub: '', a: b.tp, b: i.tp, fmt: v => v.toFixed(0) },
+            { label: 'kWh/hr', sub: '', a: b.kwh, b: i.kwh, fmt: v => v.toFixed(2) }]);
+          lineChart($('#cvLabLine'), [{ data: lab.base.map(o => o.nm), color: '#f43f5e', label: 'baseline' }, { data: lab.imp.map(o => o.nm), color: '#22d3ee', label: 'improved' }], { min: 0, n: 100, dec: 0 });
+        }
+      }
+
+      /* ================= render loop ================= */
+      let last = performance.now(), acc = 0, uiT = 0, sampT = 0, hbT = 0, vrT = 0;
+      function tick(now) {
+        requestAnimationFrame(tick);
+        const dt = Math.min(0.05, (now - last) / 1000); last = now;
+        acc += dt * simSpeed; let guard = 0;
+        while (acc >= 0.05 && guard++ < 12) { sim.step(0.05); updateTwin(0.05); acc -= 0.05; }
+        if (guard >= 12) acc = 0;
+        updateScene(now / 1000); updateCamera(); renderer.render(scene, camera);
+        uiT += dt; if (uiT >= 0.25) { uiT = 0; ui(); }
+        sampT += dt; if (sampT >= 1) { sampT = 0; twin.pwrHist.push(sim.robots.reduce((s, r) => s + r.kw, 0)); twin.idxHist.push(twin.gap); if (twin.pwrHist.length > 120) twin.pwrHist.shift(); if (twin.idxHist.length > 120) twin.idxHist.shift(); }
+        hbT += dt; if (hbT >= 5) { hbT = 0; const fm = fleetMetrics(); auditLog('TELEMETRY', 'risk=' + fm.lvl + ' minTTC=' + (isFinite(fm.mt) ? fm.mt.toFixed(1) : 'inf') + ' holds=' + fm.holds + ' kWh=' + (sim.m.wh / 1000).toFixed(4) + ' gap=' + twin.gap.toFixed(0)); }
+        vrT += dt; if (vrT >= 15) { vrT = 0; verifyChain(); }
+      }
+      const _v = new THREE.Vector3();
+      function updateScene(time) {
+        const showRings = $('#chkRings').checked, showRoutes = $('#chkRoutes').checked, showGhost = $('#chkGhost').checked, hz = +$('#rngHorizon').value;
+        sim.robots.forEach((r, i) => {
+          const a = amrViz[i]; a.g.position.set(r.x, 0, r.z); a.g.rotation.y = Math.atan2(r.dx, r.dz);
+          a.beacon.material.color.setHex(r.hold ? (Math.floor(time * 6) % 2 ? 0xf43f5e : 0x400010) : r.color);
+          // danger zone rings
+          const Rs = Math.max(0.75, BODY + r.stopDist), Ro = Math.max(1.15, Rs + r.v * hz), col = ringColor(r.minTTC), pulse = 0.55 + 0.25 * Math.sin(time * (r.minTTC < 2 ? 10 : 3));
+          [a.outer, a.inner, a.disc].forEach(m => { m.visible = showRings; m.material.color.setHex(col); m.position.x = r.x; m.position.z = r.z; });
+          a.outer.scale.set(Ro, Ro, 1); a.inner.scale.set(Rs, Rs, 1); a.disc.scale.set(Ro, Ro, 1);
+          a.outer.material.opacity = pulse * 0.8; a.inner.material.opacity = 0.95; a.disc.material.opacity = r.minTTC < 2 ? 0.2 : 0.09;
+          // routes
+          const show = showRoutes && r.path.length > 0; a.route.visible = show; a.pts.visible = show; a.goal.visible = show && r.goal !== null;
+          if (show) {
+            const pa = a.route.geometry.attributes.position, pp = a.pts.geometry.attributes.position; let k = 0;
+            pa.setXYZ(k++, r.x, 0.09, r.z); for (const w of r.path) { if (k >= a.MAXP) break; pa.setXYZ(k, w.x, 0.09, w.z); pp.setXYZ(k - 1, w.x, 0.1, w.z); k++; }
+            pa.needsUpdate = true; pp.needsUpdate = true; a.route.geometry.setDrawRange(0, k); a.pts.geometry.setDrawRange(0, k - 1);
+            if (r.goal !== null) a.goal.position.set(cx2x(r.goal % GW), 0.06, cz2z((r.goal / GW) | 0));
+          }
+          // superseded route
+          const age = sim.t - r.prevT, oshow = showRoutes && r.prevPath.length > 1 && age < 12; a.old.visible = oshow;
+          if (oshow) {
+            const oa = a.old.geometry.attributes.position; let k = 0; for (const w of r.prevPath) { if (k >= a.MAXP) break; oa.setXYZ(k++, w.x, 0.12, w.z); }
+            oa.needsUpdate = true; a.old.geometry.setDrawRange(0, k); a.old.computeLineDistances(); a.old.material.opacity = clamp(1 - age / 12, 0.1, 0.9);
+          }
+          // reality ghost
+          const d = twin.drift[i]; a.ghost.visible = showGhost; a.link.visible = showGhost;
+          if (showGhost) {
+            a.ghost.position.set(r.x + d.x, 0.3, r.z + d.z); a.ghost.rotation.y = a.g.rotation.y;
+            const la = a.link.geometry.attributes.position; la.setXYZ(0, r.x, 0.5, r.z); la.setXYZ(1, r.x + d.x, 0.5, r.z + d.z); la.needsUpdate = true;
+          }
+        });
+        pairLines.forEach(pl => {
+          const t = sim.ttcM[pl.i][pl.j], A = sim.robots[pl.i], B = sim.robots[pl.j], vis = showRings && isFinite(t) && t < 3.5; pl.l.visible = vis;
+          if (vis) { const pa = pl.l.geometry.attributes.position; pa.setXYZ(0, A.x, 0.7, A.z); pa.setXYZ(1, B.x, 0.7, B.z); pa.needsUpdate = true; pl.l.material.color.setHex(ringColor(t)); }
+        });
+        const live = new Set();
+        sim.hazards.forEach(h => {
+          live.add(h.id); if (!hazViz.has(h.id)) addHazardViz(h);
+          const v = hazViz.get(h.id), c = h.state === 'MITIGATED' ? 0xfbbf24 : (h.state === 'REJECTED' ? 0xd946ef : 0xf43f5e), p = 0.6 + 0.4 * Math.sin(time * 4);
+          v.disc.material.color.setHex(c); v.disc.material.opacity = h.state === 'MITIGATED' ? 0.16 : 0.22 + 0.14 * p; v.ring.material.color.setHex(c); v.beam.material.color.setHex(c); v.keep.visible = h.state === 'MITIGATED'; v.cone.rotation.y = time * 2; v.beam.material.opacity = 0.25 + 0.3 * p;
+        });
+        hazViz.forEach((v, id) => { if (!live.has(id)) removeHazardViz(id); });
+        rim.intensity = 0.5 + 0.15 * Math.sin(time * 1.3);
+      }
+
+      /* ================= multilingual AI Copilot ================= */
+      const LANGS = { en: 'English', hi: 'हिन्दी', te: 'తెలుగు', es: 'Español', fr: 'Français', zh: '中文' };
+      const HELP_CMDS = 'status · inject hazard · clear hazards · energy · ttc · audit · scenario · twin · approvals · optimize · follow 3 · reset view';
+      const T = {
+        en: {
+          hello: 'OMEGA Copilot online. Ask about fleet status, hazards, energy, TTC, approvals, scenarios or twin gap.',
+          status: (n, h, z, r) => `Fleet: ${n} AMRs active, ${h} on hold, ${z} hazard(s). Fleet risk: ${r}.`,
+          hazards: (z, p) => `${z} hazard(s) on the floor, ${p} approval(s) pending.`,
+          injected: 'Red Team hazard injected. A human approval request is open.', cleared: 'All hazards cleared. Fleet resuming.',
+          energy: (k, p) => `Fleet energy so far: ${k} kWh. Projected ${p} kWh per 8-hour shift.`,
+          ttc: (t, id) => `Lowest time-to-collision: ${t} (AMR-${id}).`,
+          audit: (n, ok) => `${n} audit blocks, chain ${ok ? 'verified ✓' : 'BROKEN ✗'}.`,
+          scenario: 'Scenario Lab runs 100 seeded scenarios and compares baseline vs improved. Starting the benchmark now.',
+          twin: (g, s) => `Twin–reality gap index ${g}/100 (${s}).`,
+          pending: n => n ? `${n} approval(s) pending — opening the dialog.` : 'No approvals pending.',
+          optimize: 'Route optimization proposal created. Awaiting human approval.',
+          follow: n => `Following AMR-${n}.`, reset: 'View reset.', help: 'Try: ' + HELP_CMDS, unknown: 'I did not understand. Type "help" for commands.'
+        },
+        hi: {
+          hello: 'OMEGA कोपायलट सक्रिय। फ्लीट स्थिति, खतरे, ऊर्जा, TTC, अनुमोदन, परिदृश्य या ट्विन गैप के बारे में पूछें।',
+          status: (n, h, z, r) => `फ्लीट: ${n} AMR सक्रिय, ${h} होल्ड पर, ${z} खतरा। जोखिम: ${r}।`,
+          hazards: (z, p) => `फ़र्श पर ${z} खतरा, ${p} अनुमोदन लंबित।`,
+          injected: 'रेड टीम खतरा जोड़ा गया। मानव अनुमोदन अनुरोध खुला है।', cleared: 'सभी खतरे हटाए गए। फ्लीट फिर चालू।',
+          energy: (k, p) => `अब तक फ्लीट ऊर्जा ${k} kWh; 8 घंटे की शिफ्ट के लिए अनुमान ${p} kWh।`,
+          ttc: (t, id) => `न्यूनतम टकराव-समय: ${t} (AMR-${id})।`,
+          audit: (n, ok) => `${n} ऑडिट ब्लॉक, चेन ${ok ? 'सत्यापित ✓' : 'टूटी ✗'}।`,
+          scenario: 'सिनेरियो लैब 100 सीड-आधारित परिदृश्य चलाकर बेसलाइन और सुधारित की तुलना करता है। बेंचमार्क शुरू हो रहा है।',
+          twin: (g, s) => `ट्विन–वास्तविकता गैप सूचकांक ${g}/100 (${s})।`,
+          pending: n => n ? `${n} अनुमोदन लंबित — संवाद खोल रहा हूँ।` : 'कोई अनुमोदन लंबित नहीं।',
+          optimize: 'रूट ऑप्टिमाइज़ेशन प्रस्ताव बनाया गया। मानव अनुमोदन की प्रतीक्षा।',
+          follow: n => `AMR-${n} का अनुसरण।`, reset: 'दृश्य रीसेट।', help: 'आज़माएँ: ' + HELP_CMDS, unknown: 'समझ नहीं आया। "help" लिखें।'
+        },
+        te: {
+          hello: 'OMEGA కోపైలట్ సిద్ధం. ఫ్లీట్ స్థితి, ప్రమాదాలు, శక్తి, TTC, ఆమోదాలు, సినారియోలు లేదా ట్విన్ గ్యాప్ గురించి అడగండి.',
+          status: (n, h, z, r) => `ఫ్లీట్: ${n} AMRలు పనిచేస్తున్నాయి, ${h} హోల్డ్‌లో, ${z} ప్రమాదం(లు). రిస్క్: ${r}.`,
+          hazards: (z, p) => `నేలపై ${z} ప్రమాదం(లు), ${p} ఆమోదం(లు) పెండింగ్‌లో.`,
+          injected: 'రెడ్ టీమ్ ప్రమాదం చేర్చబడింది. మానవ ఆమోద అభ్యర్థన తెరిచి ఉంది.', cleared: 'అన్ని ప్రమాదాలు తొలగించబడ్డాయి. ఫ్లీట్ తిరిగి నడుస్తోంది.',
+          energy: (k, p) => `ఇప్పటివరకు ఫ్లీట్ శక్తి ${k} kWh; 8 గంటల షిఫ్ట్‌కు అంచనా ${p} kWh.`,
+          ttc: (t, id) => `కనిష్ఠ ఢీకొనే సమయం: ${t} (AMR-${id}).`,
+          audit: (n, ok) => `${n} ఆడిట్ బ్లాక్‌లు, చైన్ ${ok ? 'ధృవీకరించబడింది ✓' : 'విరిగింది ✗'}.`,
+          scenario: 'సినారియో ల్యాబ్ 100 సీడ్ సినారియోలను నడిపి బేస్‌లైన్ vs మెరుగైన దానిని పోలుస్తుంది. బెంచ్‌మార్క్ ప్రారంభమవుతోంది.',
+          twin: (g, s) => `ట్విన్–వాస్తవ గ్యాప్ సూచిక ${g}/100 (${s}).`,
+          pending: n => n ? `${n} ఆమోదం(లు) పెండింగ్ — డైలాగ్ తెరుస్తున్నాను.` : 'పెండింగ్ ఆమోదాలు లేవు.',
+          optimize: 'రూట్ ఆప్టిమైజేషన్ ప్రతిపాదన సృష్టించబడింది. మానవ ఆమోదం కోసం వేచి ఉంది.',
+          follow: n => `AMR-${n}ని అనుసరిస్తున్నాను.`, reset: 'వ్యూ రీసెట్ అయింది.', help: 'ప్రయత్నించండి: ' + HELP_CMDS, unknown: 'అర్థం కాలేదు. "help" అని టైప్ చేయండి.'
+        },
+        es: {
+          hello: 'OMEGA Copilot en línea. Pregunte por el estado de la flota, peligros, energía, TTC, aprobaciones, escenarios o la brecha del gemelo.',
+          status: (n, h, z, r) => `Flota: ${n} AMR activos, ${h} en espera, ${z} peligro(s). Riesgo: ${r}.`,
+          hazards: (z, p) => `${z} peligro(s) en el suelo, ${p} aprobación(es) pendiente(s).`,
+          injected: 'Peligro del Red Team inyectado. Hay una solicitud de aprobación humana abierta.', cleared: 'Todos los peligros eliminados. La flota se reanuda.',
+          energy: (k, p) => `Energía de la flota hasta ahora: ${k} kWh. Proyección ${p} kWh por turno de 8 h.`,
+          ttc: (t, id) => `Menor tiempo de colisión: ${t} (AMR-${id}).`,
+          audit: (n, ok) => `${n} bloques de auditoría, cadena ${ok ? 'verificada ✓' : 'ROTA ✗'}.`,
+          scenario: 'El Scenario Lab ejecuta 100 escenarios con semilla y compara base vs mejorado. Iniciando el benchmark.',
+          twin: (g, s) => `Índice de brecha gemelo–realidad ${g}/100 (${s}).`,
+          pending: n => n ? `${n} aprobación(es) pendiente(s) — abriendo el diálogo.` : 'No hay aprobaciones pendientes.',
+          optimize: 'Propuesta de optimización de rutas creada. Esperando aprobación humana.',
+          follow: n => `Siguiendo AMR-${n}.`, reset: 'Vista restablecida.', help: 'Pruebe: ' + HELP_CMDS, unknown: 'No entendí. Escriba "help" para ver los comandos.'
+        },
+        fr: {
+          hello: 'OMEGA Copilot en ligne. Interrogez-moi sur l’état de la flotte, les dangers, l’énergie, le TTC, les approbations, les scénarios ou l’écart du jumeau.',
+          status: (n, h, z, r) => `Flotte : ${n} AMR actifs, ${h} en attente, ${z} danger(s). Risque : ${r}.`,
+          hazards: (z, p) => `${z} danger(s) au sol, ${p} approbation(s) en attente.`,
+          injected: 'Danger Red Team injecté. Une demande d’approbation humaine est ouverte.', cleared: 'Tous les dangers sont supprimés. La flotte repart.',
+          energy: (k, p) => `Énergie de la flotte jusqu’ici : ${k} kWh. Projection ${p} kWh pour un poste de 8 h.`,
+          ttc: (t, id) => `Plus faible temps avant collision : ${t} (AMR-${id}).`,
+          audit: (n, ok) => `${n} blocs d’audit, chaîne ${ok ? 'vérifiée ✓' : 'ROMPUE ✗'}.`,
+          scenario: 'Le Scenario Lab exécute 100 scénarios à graine fixe et compare référence vs amélioré. Lancement du benchmark.',
+          twin: (g, s) => `Indice d’écart jumeau–réalité ${g}/100 (${s}).`,
+          pending: n => n ? `${n} approbation(s) en attente — ouverture de la fenêtre.` : 'Aucune approbation en attente.',
+          optimize: 'Proposition d’optimisation d’itinéraires créée. En attente d’approbation humaine.',
+          follow: n => `Suivi de AMR-${n}.`, reset: 'Vue réinitialisée.', help: 'Essayez : ' + HELP_CMDS, unknown: 'Je n’ai pas compris. Tapez "help" pour les commandes.'
+        },
+        zh: {
+          hello: 'OMEGA 副驾驶已上线。可询问车队状态、危险、能耗、TTC、审批、场景或孪生差距。',
+          status: (n, h, z, r) => `车队：${n} 台 AMR 运行中，${h} 台暂停，${z} 个危险。风险等级：${r}。`,
+          hazards: (z, p) => `地面有 ${z} 个危险，${p} 项审批待处理。`,
+          injected: '已注入红队危险。人工审批请求已打开。', cleared: '所有危险已清除，车队恢复运行。',
+          energy: (k, p) => `车队累计能耗 ${k} kWh；按 8 小时班次预计 ${p} kWh。`,
+          ttc: (t, id) => `最低碰撞时间：${t}（AMR-${id}）。`,
+          audit: (n, ok) => `${n} 个审计区块，哈希链${ok ? '已验证 ✓' : '已损坏 ✗'}。`,
+          scenario: '场景实验室将运行 100 个固定种子场景并对比基线与改进方案。基准测试开始。',
+          twin: (g, s) => `孪生–现实差距指数 ${g}/100（${s}）。`,
+          pending: n => n ? `${n} 项审批待处理——正在打开对话框。` : '没有待处理的审批。',
+          optimize: '已创建路径优化提案，等待人工审批。',
+          follow: n => `正在跟随 AMR-${n}。`, reset: '视图已重置。', help: '试试：' + HELP_CMDS, unknown: '没听懂。输入 "help" 查看命令。'
+        }
+      };
+      const KW = {
+        reset: ['reset', 'रीसेट', 'రీసెట్', 'reiniciar', 'réinitialiser', 'reinitialiser', '重置'],
+        follow: ['follow', 'फॉलो', 'अनुसरण', 'ఫాలో', 'అనుసరి', 'seguir', 'suivre', '跟随', '跟隨'],
+        clear: ['clear', 'हटा', 'తొలగ', 'borrar', 'limpiar', 'eliminar', 'effacer', 'supprimer', '清除'],
+        inject: ['inject', 'इंजेक्ट', 'ఇంజెక్ట్', 'inyectar', 'injecter', '注入'],
+        scenario: ['scenario', 'benchmark', 'परिदृश्य', 'सिनेरियो', 'సినారియో', 'escenario', 'scénario', 'scenarios', '场景'],
+        twin: ['twin', 'gap', 'ट्विन', 'గ్యాప్', 'ట్విన్', 'gemelo', 'jumeau', '孪生'],
+        energy: ['energy', 'kwh', 'ऊर्जा', 'శక్తి', 'energía', 'energia', 'énergie', '能耗', '能源'],
+        ttc: ['ttc', 'collision', 'danger zone', 'टक्कर', 'ఢీకొ', 'colisión', 'colision', '碰撞'],
+        audit: ['hash', 'audit', 'ऑडिट', 'ఆడిట్', 'auditoría', 'auditoria', '审计'],
+        approve: ['approval', 'approve', 'pending', 'अनुमोदन', 'ఆమోద', 'aprobaci', 'approbation', '审批'],
+        optimize: ['optimi', 'route', 'reroute', 'मार्ग', 'रूट', 'రూట్', 'ruta', 'itinéraire', 'itineraire', '路径', '路线'],
+        hazards: ['hazard', 'danger', 'खतरा', 'ప్రమాద', 'peligro', '危险'],
+        status: ['status', 'fleet', 'स्थिति', 'फ्लीट', 'స్థితి', 'ఫ్లీట్', 'estado', 'flota', 'état', 'etat', 'flotte', '状态', '车队'],
+        help: ['help', 'मदद', 'సహాయం', 'ayuda', 'aide', '帮助']
+      };
+      let cpLang = 'en';
+      const has = (q, k) => KW[k].some(w => q.includes(w));
+      function cpSay(text, who) { const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text; const l = $('#cpLog'); l.appendChild(d); l.scrollTop = l.scrollHeight; }
+      function copilotReply(raw) {
+        const q = raw.toLowerCase(), L = T[cpLang], fm = fleetMetrics(); let act = '';
+        if (has(q, 'reset')) { resetView(); act = 'reset'; cpSay(L.reset, 'bot'); }
+        else if (has(q, 'follow') || /^\s*\d\s*$/.test(q)) { const m = q.match(/[1-5]/); const n = m ? +m[0] : 1; setFollow(n - 1); act = 'follow ' + n; cpSay(L.follow(n), 'bot'); }
+        else if (has(q, 'clear') && has(q, 'hazards')) { clearHazards(); act = 'clear'; cpSay(L.cleared, 'bot'); }
+        else if (has(q, 'inject')) { $('#btnInject').click(); act = 'inject'; cpSay(L.injected, 'bot'); }
+        else if (has(q, 'scenario')) { act = 'scenario'; cpSay(L.scenario, 'bot'); $$('.tab').find(t => t.dataset.tab === 'lab').click(); runLab(); }
+        else if (has(q, 'twin')) { const s = twin.gap < 30 ? 'SYNCED' : (twin.gap < 60 ? 'DRIFT' : 'DIVERGED'); cpSay(L.twin(twin.gap.toFixed(0), s), 'bot'); }
+        else if (has(q, 'energy')) { const kwh = sim.m.wh / 1000, proj = sim.t > 5 ? kwh / sim.t * 3600 * 8 : 0; cpSay(L.energy(kwh.toFixed(4), proj.toFixed(1)), 'bot'); }
+        else if (has(q, 'ttc')) { cpSay(L.ttc(isFinite(fm.mt) ? fm.mt.toFixed(1) + ' s' : '—', fm.mi + 1), 'bot'); }
+        else if (has(q, 'audit')) { const ok = verifyChain(); cpSay(L.audit(audit.chain.length, ok), 'bot'); }
+        else if (has(q, 'approve')) { cpSay(L.pending(queue.length), 'bot'); if (queue.length) showModal(); }
+        else if (has(q, 'optimize')) { requestOptimization(); act = 'optimize'; cpSay(L.optimize, 'bot'); }
+        else if (has(q, 'hazards')) { cpSay(L.hazards(sim.hazards.length, queue.length), 'bot'); }
+        else if (has(q, 'status')) { cpSay(L.status(sim.robots.length, fm.holds, sim.hazards.length, fm.lvl), 'bot'); }
+        else if (has(q, 'help')) { cpSay(L.help, 'bot'); }
+        else cpSay(L.unknown, 'bot');
+        if (act) auditLog('COPILOT_CMD', 'lang=' + cpLang + ' cmd=' + act);
+      }
+      function cpChips() {
+        const labels = { en: ['status', 'inject hazard', 'energy', 'ttc', 'scenario', 'help'], hi: ['स्थिति', 'खतरा इंजेक्ट', 'ऊर्जा', 'ttc', 'परिदृश्य', 'मदद'], te: ['స్థితి', 'ప్రమాదం ఇంజెక్ట్', 'శక్తి', 'ttc', 'సినారియో', 'సహాయం'], es: ['estado', 'inyectar peligro', 'energía', 'ttc', 'escenario', 'ayuda'], fr: ['état', 'injecter danger', 'énergie', 'ttc', 'scénario', 'aide'], zh: ['状态', '注入危险', '能耗', 'ttc', '场景', '帮助'] }[cpLang];
+        $('#cpChips').innerHTML = ''; labels.forEach(t => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => send(t); $('#cpChips').appendChild(b); });
+      }
+      function send(t) { t = (t || '').trim(); if (!t) return; cpSay(t, 'me'); copilotReply(t); $('#cpInput').value = ''; }
+      Object.keys(LANGS).forEach(k => { const op = document.createElement('option'); op.value = k; op.textContent = LANGS[k]; $('#cpLang').appendChild(op); });
+      $('#cpLang').onchange = e => { cpLang = e.target.value; cpChips(); cpSay(T[cpLang].hello, 'bot'); };
+      $('#cpToggle').onclick = () => { $('#cpPanel').classList.toggle('open'); };
+      $('#cpSend').onclick = () => send($('#cpInput').value);
+      $('#cpInput').addEventListener('keydown', e => { if (e.key === 'Enter') send($('#cpInput').value); });
+      cpChips(); cpSay(T.en.hello, 'bot');
+
+      /* ================= boot ================= */
+      auditLog('SYSTEM_BOOT', 'OMEGA×PHANTOM safety twin online; 5 AMRs; SHA-256 chain genesis', 'good');
+      auditLog('SAFETY_STACK', 'TTC braking + hazard reroute + approval workflow ENABLED', 'good');
+      ui(); requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+
+</html>
